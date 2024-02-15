@@ -1,0 +1,28 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-launch-cluster
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: debasish.sahoo@nttdata.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-launch-cluster
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - dns01:
+          azureDNS:
+            subscriptionID: e71eb3cd-83f2-46eb-8f47-3b779e27672f
+            resourceGroupName: public-dns-eastus-rg-000
+            hostedZoneName: launch.dresdencraft.com
+            # Azure Cloud Environment, default to AzurePublicCloud
+            environment: AzurePublicCloud
+            # optional, only required if node pools have more than 1 managed identity assigned
+            managedIdentity:
+              # client id of the node pool managed identity (can not be set at the same time as resourceID)
+              clientID: 3a8999ad-2d96-4002-b52b-5ca1b26f4f42
+              # resource id of the managed identity (can not be set at the same time as clientID)
+              # resourceID: YOUR_MANAGED_IDENTITY_RESOURCE_ID

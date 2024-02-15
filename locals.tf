@@ -10,6 +10,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-output "string" {
-  value = format("%s🍰%s", module.cake_prefix.string, module.cake_suffix.string)
+locals {
+  default_tags = {
+    provisioner = "Terraform"
+  }
+
+  # container_registry_ids = var.container_registry != null ? concat(var.container_registry_ids, [module.acr[0].container_registry_id]) : var.container_registry_ids
+
+  tags = merge(local.default_tags, var.tags)
 }

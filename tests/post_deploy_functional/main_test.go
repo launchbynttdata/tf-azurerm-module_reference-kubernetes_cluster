@@ -17,7 +17,7 @@ import (
 
 	"github.com/nexient-llc/lcaf-component-terratest-common/lib"
 	"github.com/nexient-llc/lcaf-component-terratest-common/types"
-	testimpl "github.com/nexient-llc/tf-azurerm-module_collection-kubernetes_cluster/tests/testimpl"
+	"github.com/nexient-llc/tf-azurerm-module_collection-kubernetes_cluster/tests/testimpl"
 )
 
 const (
@@ -27,9 +27,21 @@ const (
 
 func TestKubernetesModule(t *testing.T) {
 
-	ctx := types.TestContext{
-		TestConfig: &testimpl.ThisTFModuleConfig{},
-	}
-	lib.RunSetupTestTeardown(t, testConfigsExamplesFolderDefault, infraTFVarFileNameDefault, ctx,
-		testimpl.TestComposableComplete)
+	ctx := types.CreateTestContextBuilder().
+		SetTestConfig(&testimpl.ThisTFModuleConfig{}).
+		SetTestConfigFolderName(testConfigsExamplesFolderDefault).
+		SetTestConfigFileName(infraTFVarFileNameDefault).
+		SetTestSpecificFlags(map[string]types.TestFlags{
+			// The managed identity attached to AKS cluster causes non-idempotent apply
+			"public-cluster": {
+				"IS_TERRAFORM_IDEMPOTENT_APPLY": false,
+			},
+			"private-cluster": {
+				"IS_TERRAFORM_IDEMPOTENT_APPLY": false,
+			},
+		}).
+		Build()
+
+	lib.RunSetupTestTeardown(t, *ctx, testimpl.TestPrivateCluster, testimpl.TestPublicCluster)
+
 }

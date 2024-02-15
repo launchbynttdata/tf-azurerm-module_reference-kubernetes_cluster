@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-hello-world-ingress-public
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: "letsencrypt-cluster"
+spec:
+  ingressClassName: public-ingress
+  tls:
+    - hosts:
+      - demo-public.sandbox.launch.dresdencraft.com
+      secretName: demo-hello-world-ingress-public-tls
+  rules:
+  - host: demo-public.sandbox.launch.dresdencraft.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: aks-helloworld
+              port:
+                number: 80

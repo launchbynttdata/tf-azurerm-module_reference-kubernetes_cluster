@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: emojivoto-ingress
+  namespace: emojivoto
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+#    nginx.ingress.kubernetes.io/use-regex: "true"
+#    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: "letsencrypt-cluster"
+spec:
+  ingressClassName: public-ingress
+  tls:
+    - hosts:
+      - emojivoto.sandbox.launch.dresdencraft.com
+      secretName: emojivoto-public-tls
+  rules:
+  - host: emojivoto.sandbox.launch.dresdencraft.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: web-svc-2
+              port:
+                number: 80

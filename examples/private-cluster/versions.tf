@@ -10,20 +10,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-resource "random_integer" "cake_pos" {
-  max = var.length - 2
-  min = 1
-}
+terraform {
+  required_version = "<= 1.5.5"
 
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">=3.67.0"
+    }
 
-module "cake_prefix" {
-  source = "../.."
-
-  length = random_integer.cake_pos.result
-}
-
-module "cake_suffix" {
-  source = "../.."
-
-  length = (var.length - 1) - random_integer.cake_pos.result
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.5"
+    }
+  }
 }

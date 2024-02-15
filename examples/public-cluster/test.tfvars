@@ -9,8 +9,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+product_family  = "deb"
+product_service = "pub"
+agents_size     = "Standard_D2_v2"
 
-variable "length" {
-  type    = number
-  default = 24
+node_pools = {
+  apppool1 = {
+    name       = "apppool1"
+    node_count = 1
+    tags = {
+      application = "App1"
+    }
+    vm_size = "Standard_D2_v2"
+    mode    = "User"
+    node_labels = {
+      application = "App1"
+    }
+    os_sku  = "Ubuntu"
+    os_type = "Linux"
+  }
 }
