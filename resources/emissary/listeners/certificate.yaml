@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: emissary-ingress-tls
+spec:
+  dnsNames:
+    - emissary.sandbox.launch.dresdencraft.com
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt-cluster
+  secretName: emissary-ingress-tls

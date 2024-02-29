@@ -1,17 +1,29 @@
 # Azure AD Integration with AKS
 
-This guide will walk you through the process of integrating Azure AD with AKS.
+This guide will walk you through the process of integrating Azure AD with AKS. Once enabled, the users of an organization
+can use their AD credentials or Single-sign-on (SSO) to login to the AKS cluster using `kubectl`. The access of the users and groups can be
+controlled using RBAC types supported by Azure.
 
-In order to integrate AKS with Azure AD, the pre-requisite is to have a Azure AD group and at least one user assigned to that group.
-The `object_id` of the group needs to be passed as parameter to `rbac_aad_admin_group_object_ids` in the terraform configuration.
-It is important to have at least one group assigned to the AKS as some use needs to first log in to the AKS in order to create other roles and
-role bindings to enable RBAC on the cluster. In absence of any local accounts (`local_account_disabled = true`),
-user from the admin group will be used for the initial login to `kubectl`
+Note that `Azure AD integration` is different from [Pod managed Identities](https://learn.microsoft.com/en-us/azure/aks/use-azure-ad-pod-identity). The former is used to authenticate/authorize users to the cluster,
+while the latter is used to authenticate the pods to the Azure resources and comes under Application Security.
 
-Once the AKS cluster is provisioned using the below configuration, there are 2 types of credentials that can be fetched from the AKS cluster (while using terraform)
+## Prerequisites
 
-- Admin Credentials (`kube_admin_config_raw`): When Azure AD integration is enabled, this field is NOT EMPTY only when `local_account_disabled = false`
-- User Credentials (`kube_config_raw`): This credential is used to login using the AD user credentials (For the users who are added to the groups passed in as inputs `rbac_aad_admin_group_object_ids`)
+1. Access to Azure AD (Microsoft Entra ID) to create users, groups and service principals
+
+2. Must have at least 1 Azure AD group and one AD user/service-principal assigned to that AD group.
+
+3. The AKS mandates that for AD integration, the `object_id` of at least 1 AD group be passed as parameter to `rbac_aad_admin_group_object_ids` in the terraform configuration.
+
+In absence of any local accounts ( when `local_account_disabled = true`), only users from this AD group can login to `kubectl`.
+Some user from this group needs to first login to `kubectl` and create k8s RBAC roles/rolebindings to provide other users access to the cluster.
+
+
+## AKS Credentials
+AKS by default provide 2 set of users to interact with the cluster via `kubectl`
+
+- **Admin Credentials (terraform output: `kube_admin_config_raw`):** When Azure AD integration is enabled (`rbac_aad = true`) and `local_account_disabled = false`, this credential is available to login to the cluster. It has full admin access to the cluster
+- **User Credentials (terraform output: `kube_config_raw`):** This credential is used to login using the AD user credentials (For the users who are added to the groups passed in as inputs `rbac_aad_admin_group_object_ids`)
 
 Using `az cli`
 
@@ -66,13 +78,21 @@ local_account_disabled = false
       ]
     }
   ```
-### Kubernetes RBAC
+### Kubernetes RBAC (our preferred method)
+
 - Kubernetes RBAC is enabled by default during AKS cluster creation. `rbac_aad_azure_rbac_enabled = false` will disable Azure RBAC.
 - Kubernetes RBAC can be configured using `kubectl` commands
+- This is our preferred method of RBAC as the other method requires the Azure AD to be in the same tenant as the AKS, which may not be the case always.
+
+Examples of RBAC roles and bindings can be found as shown below
+- Read only access to the cluster [read-only-role](./read-only-role.yaml)
+- Complete access to a specific namespace [dev1-user-role](./dev1-user-role.yaml)
 
 
 ### Local accounts
-When you deploy an AKS cluster, local accounts are enabled by default. Even when you enable RBAC or Microsoft Entra integration, `--admin` access still exists as a non-auditable backdoor option.
+
+When you deploy an AKS cluster, local accounts are enabled by default. Even when you enable RBAC or Microsoft Entra integration,
+`--admin` access still exists as a non-auditable backdoor option.
 
 
 If `local_account_disabled` is set to `true`, then the `kube_admin_config_raw` output will not be available.
@@ -96,7 +116,8 @@ $ az aks get-credentials -n <aks-name> -g <rg-name> -f -
 
 ## Login to kubectl
 
-In order to login using the user credentials, its essential to install `kubelogin` binary. [Kube Login](https://azure.github.io/kubelogin/concepts/login-modes/sp.html)
+With AD enabled, its mandatory to install `kubelogin` binary to be able to login to `kubectl` using your SSO credentials. [Kube Login](https://azure.github.io/kubelogin/concepts/login-modes/sp.html)
+
 `kubelogin` can be installed using asdf
 
 ```
@@ -105,35 +126,53 @@ asdf plugin add kubelogin
 asdf install
 ```
 
-**Note:**  `kubelogin` modifies the $KUBECONFIG file to add the user credentials. So, its essential to have a backup of the original kubeconfig file. Or fetch it using `terraform output` or `az aks get-credentials` command when you want to use `kubelogin` again for a different login.
+**Note:**  `kubelogin` modifies the $KUBECONFIG file to add the user credentials. So, its essential to have a backup of the original kubeconfig file.
+Or fetch it using `terraform output` or `az aks get-credentials` command when you want to use `kubelogin` again for a different login.
 
 ### Using SSO user (interactive login)
 
-Now once the above set up is done, if you want to run any kube command like `kube get nodes`
-then just run the kubectl command. When executing this command for the first time,
-it will prompt to open a link in the browser https://microsoft.com/devicelogin and then login using your `sso credentials`.
-If the admin group attached to the AKS cluster contains your user, then you will be authenticated else an authentication error will be thrown.
+To login to the `kubectl` using your SSO, you can  do `kubelogin convert-kubeconfig`. This defaults to the type `devicecode`, meaning this command will display
+a device code in the console and ask you to open an URL in the browser to confirm this device code and then redirect you to login using your SSO.
 
+You can also skip the above step and just run any kubectl command like `kube get nodes`. This will also take you through the same process as described above.
 
-When you run the `kube` command for the first time, it will ask you to open a browser and authenticate before you can run any other kubectl commands.
-If the login is successful, the token in stored at `.kube/cache/kubelogin/`
+When executing this command for the first time, a device code will be displayed in the console, and it will prompt to open a link in the browser https://microsoft.com/devicelogin.
+User needs to paste the device code in the browser upon which will be redirected to enter the `sso credentials`.
+If the user is authorized (part of the admin AD group), then they will be authenticated else an authentication error will be thrown.
+
+Upon successful login, the token is cached at `~/.kube/cache/kubelogin/` and the `KUBECONFIG` file is modified to add the user credentials.
 
 ### Using service principal (non-interactive login)
-```
+
+This mode is very useful while running the kubectl commands in a CI/CD pipeline or authenticating inside the code where
+user interaction is not permitted
+
+```shell
+
 export AZURE_CLIENT_ID=<spn client id>
 export AZURE_CLIENT_SECRET=<spn secret>
 kubelogin convert-kubeconfig -l spn
+
+## Or
+kubelogin convert-kubeconfig -l spn   \
+  --client-id=<client_id>  \
+  --client-secret=<client_secret>
 ```
 No tokens are cached in case of service principal login
 
-There is no straight forward way to verify if the user is logged in using this service principal. Check the `KUBECONFIG` file to see if `--login=spn` is added.
+There is no straight forward way to verify if the user is logged in using this service principal.
+Check the `KUBECONFIG` file to see if `--login=spn` is added.
 
 
 ### Using az cli login
+
 If you are already logged into azure using `az login`, and you want to use the same credentials to login to the AKS, then use the below command
 ```
 kubelogin convert-kubeconfig -l azurecli
 ```
+
+**Note:** It is often tricky when you try to test out things by login in using different methods - device_code, service-principal, azcli etc.
+Remember to fetch the credentials each time using `terraform output` or `az aks get-credentials` before trying a different mode of login.
 
 ## References
 1. [kubelogin](https://azure.github.io/kubelogin/concepts/login-modes.html)

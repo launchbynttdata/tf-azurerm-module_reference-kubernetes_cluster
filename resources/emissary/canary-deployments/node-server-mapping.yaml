@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: node-server-mapping
+spec:
+  hostname: "*"
+  prefix: /node/
+  service: node-server
+  docs:
+    path: "/.ambassador-internal/openapi-docs"

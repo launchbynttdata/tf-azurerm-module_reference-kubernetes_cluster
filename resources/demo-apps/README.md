@@ -3,8 +3,8 @@
 Sample applications to demonstrate the use of k8s service and ingress using nginx-ingress.
 
 ```shell
-kube create ns demo
-kube apply -n demo -f demo
+kube create ns demo-apps
+kube apply -n demo-apps -f demo-apps
 ```
 
 Annotation for internal service

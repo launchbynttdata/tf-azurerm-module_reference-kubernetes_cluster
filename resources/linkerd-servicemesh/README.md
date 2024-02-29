@@ -112,7 +112,16 @@ linkerd check
 # open the dashboard default is: http://localhost:50750
 linkerd viz dashboard &
 ```
+### Expose Dashboard to the outside world
+This installation is good for development and testing in the local system. In order to expose the dashboard to the outside world, we need to set un an [Ingress resource](linkerd-dashboard-ingress.yaml).
+The below command will create an ingress resource for the dashboard
 
+Basic authentication is used to secure the dashboard.
+
+```shell
+kube apply -f linkerd-dashboard-ingress.yaml
+````
+This ingress is set up with basic credentials (admin/admin). You can change the credentials by updating the secret `linkerd-dashboard-basic-auth` and updating the ingress resource.
 ## Test with a sample app
 I have already downloaded a sample app into the `sample-apps` directory.
 
@@ -177,3 +186,4 @@ linkerd uninstall | kubectl delete -f -
 # Important Links
 - [LinkerD Official](https://linkerd.io/2.14/getting-started/)
 - [Auto rotate control plane TLS certs](https://linkerd.io/2.14/tasks/automatically-rotating-control-plane-tls-credentials/)
+- [Exposing Linkerd Dashboard](https://linkerd.io/2.14/tasks/exposing-dashboard/)

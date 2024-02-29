@@ -3,6 +3,8 @@
 ## Overview
 Manually add the ingress capability in a k8s cluster by installing ingress-nginx using helm.
 
+![Ingress-Nginx](./Ingress-workflow.drawio.png)
+
 ## Pre-requisites
 
 Before installing the ingress nginx controller, there are several pre-requisites that needs to be met.
@@ -25,7 +27,7 @@ export KUBECONFIG=aks_kubeconfig
 ### TLS certificates
 In order to enable TLS on the ingress endpoints, we need a way to provision TLS certificates. There are 2 ways we can do this
 - Provision certificates outside the `ingress-nginx` and upload them to Azure KeyVault and let the ingress object pull the object from there. The disadvantage of this approach is that these are not auto renewable
-- Other approach is to use [Cert Manager](./cert-manager/README.md). Cert Manager provisions certificates automatically whenever a ingress resource is created.
+- Other approach is to use [Cert Manager](../cert-manager/README.md). Cert Manager provisions certificates automatically whenever a ingress resource is created.
 
 ## Installation
 The installation details are covered in the document [README](./multiple-ingress-controllers/README.md)

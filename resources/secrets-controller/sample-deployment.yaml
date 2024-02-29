@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csi-secret-test-app
+  annotations:
+    reloader.stakater.com/search: "true" # If Reloader is configured, this annotation will trigger a rolling update when the secret is updated
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csi-secret-test-app
+  template:
+    metadata:
+      labels:
+        app: csi-secret-test-app
+    spec:
+      containers:
+        - name: csi-secret-test-app
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: secrets-store01-inline # Must match the name of the volume in the volumes section
+              mountPath: "/mnt/secrets-store" # The path in the container to mount the volume
+              readOnly: true
+          env:
+            - name: test1_from_keyvault # The environment variable name in the pod would be test1_from_keyvault
+              valueFrom:
+                secretKeyRef:
+                  name: testsecret # Name of the k8s secret specified in the secretProviderClass
+                  key: test1  # key of the secret in the k8s secret
+            - name: test2_from_keyvault
+              valueFrom:
+                secretKeyRef:
+                  name: testsecret
+                  key: test2
+      volumes:
+        - name: secrets-store01-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-kvname-user-msi"

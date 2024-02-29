@@ -37,7 +37,7 @@ module "resource_group" {
 }
 
 module "key_vault" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module-key_vault.git?ref=0.2.0"
+  source = "git::https://github.com/nexient-llc/tf-azurerm-module-key_vault.git?ref=0.3.0"
 
   count = var.key_vault_secrets_provider_enabled ? 1 : 0
 
@@ -46,6 +46,7 @@ module "key_vault" {
     location = var.region
   }
   key_vault_name             = module.resource_names["key_vault"].minimal_random_suffix
+  enable_rbac_authorization  = var.enable_rbac_authorization
   soft_delete_retention_days = var.kv_soft_delete_retention_days
   sku_name                   = var.kv_sku
   access_policies            = var.kv_access_policies
@@ -56,6 +57,19 @@ module "key_vault" {
   custom_tags = local.tags
 
   depends_on = [module.resource_group]
+}
+
+# Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
+module "key_vault_role_assignment" {
+  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git?ref=0.1.0"
+
+  count = var.key_vault_secrets_provider_enabled ? 1 : 0
+
+  principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
+  role_definition_name = var.key_vault_role_definition
+  scope                = module.key_vault[0].key_vault_id
+
+  depends_on = [module.aks, module.key_vault]
 }
 
 module "aks" {
@@ -153,6 +167,9 @@ module "aks" {
   rbac_aad_server_app_id            = var.rbac_aad_server_app_id
   rbac_aad_server_app_secret        = var.rbac_aad_server_app_secret
   local_account_disabled            = var.local_account_disabled
+
+  oidc_issuer_enabled       = var.oidc_issuer_enabled
+  workload_identity_enabled = var.workload_identity_enabled
 
   # Service Principal
   client_id     = var.client_id

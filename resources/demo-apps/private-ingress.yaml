@@ -9,10 +9,10 @@ spec:
   ingressClassName: private-ingress
   tls:
     - hosts:
-      - demo-private.sandbox.launch.dresdencraft.com
-      secretName: demo-hello-world-ingress-private-tls
+      - demo-apps-private.sandbox.launch.dresdencraft.com
+      secretName: demo-apps-hello-world-ingress-private-tls
   rules:
-  - host: demo-private.sandbox.launch.dresdencraft.com
+  - host: demo-apps-private.sandbox.launch.dresdencraft.com
     http:
       paths:
         - path: /

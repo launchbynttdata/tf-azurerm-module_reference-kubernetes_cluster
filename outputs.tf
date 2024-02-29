@@ -194,3 +194,8 @@ output "acr_id" {
   description = "ID of the ACR"
   value       = try(module.acr[0].container_registry_id, "")
 }
+
+output "oidc_issuer_url" {
+  description = "The OIDC issuer URL of the AKS cluster."
+  value       = module.aks.oidc_issuer_url
+}

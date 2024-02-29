@@ -1,0 +1,13 @@
+# prefix is the same and the backend service is different.
+# Weight is set to 10, which means that 10% of the traffic will be routed to the new version of the service.
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: node-server-mapping-v2
+spec:
+  hostname: "*"
+  prefix: /node/
+  service: node-server-v2
+  weight: 10
+  docs:
+    path: "/.ambassador-internal/openapi-docs"

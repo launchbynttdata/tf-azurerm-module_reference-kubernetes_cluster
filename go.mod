@@ -1,4 +1,4 @@
-module github.com/nexient-llc/tf-azurerm-module_collection-kubernetes_cluster
+module github.com/nexient-llc/tf-azurerm-module_ref-kubernetes_cluster
 
 go 1.20
 
@@ -12,8 +12,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/kops v1.28.3
 )
-
-replace github.com/nexient-llc/lcaf-component-terratest-common v0.0.0-20240117163707-a1dfafae58b4 => ../lcaf-component-terratest-common
 
 require (
 	cloud.google.com/go v0.110.6 // indirect

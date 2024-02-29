@@ -1,0 +1,21 @@
+# The name must always be `ambassador` for any namespace for the module to be recognized by the Ambassador.
+# Creates custom error messages for 404 and 500 status codes.
+apiVersion: getambassador.io/v3alpha1
+kind: Module
+metadata:
+  name: ambassador
+  namespace: default
+spec:
+  config:
+    error_response_overrides:
+      - on_status_code: 404
+        body:
+          json_format:
+            error: "Resource not found"
+            status: "%RESPONSE_CODE%"
+      - on_status_code: 500
+        body:
+          json_format:
+            error: "Application error"
+            status: "%RESPONSE_CODE%"
+            cluster: "%UPSTREAM_CLUSTER%"

@@ -23,9 +23,10 @@ The terraform input `private_dns_zone_id` should be populated with a private DNS
 ```shell
 # Create a private DNS zone in the format <sub-zone>.private.<region>.azmk8s.io
 # Copy the resource_id
+# PRIVATE_ZONE_ID=$(az network private-dns zone show --name $privateDnsHostedZoneName --resource-group $privateDnsResourceGroupName --query "id" -o tsv)
 PRIVATE_ZONE_ID="/subscriptions/e71eb3cd-83f2-46eb-8f47-3b779e27672f/resourceGroups/deb-k8s-rg/providers/Microsoft.Network/privateDnsZones/launch.private.eastus.azmk8s.io"
-# Assign role to the k8s user assigned MSI "Private DNS Zone Contributer" and "Network Contributer"
-MSI_ID="/subscriptions/e71eb3cd-83f2-46eb-8f47-3b779e27672f/resourceGroups/deb-k8s-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/deb-k8s-msi"
+# Assign role to the k8s user assigned MSI "Private DNS Zone Contributor" and "Network Contributor"
+# MSI_PRINCIPAL_ID=$(az aks show -n $aksCluster -g $aksResourceGroup --query "identityProfile.kubeletidentity.objectId" -o tsv)
 MSI_PRINCIPAL_ID="9a520834-eac1-48f0-9c04-5e22b8c1d2c7";
 az role assignment create --role "Private DNS Zone Contributor" --assignee $MSI_PRINCIPAL_ID --scope $PRIVATE_ZONE_ID
 az role assignment create --role "Network Contributor" --assignee $MSI_PRINCIPAL_ID --scope $PRIVATE_ZONE_ID

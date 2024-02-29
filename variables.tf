@@ -551,6 +551,20 @@ variable "local_account_disabled" {
   description = "(Optional) - If `true` local accounts will be disabled. Defaults to `false`. See [the documentation](https://docs.microsoft.com/azure/aks/managed-aad#disable-local-accounts) for more information."
 }
 
+# Workload Identity
+
+variable "oidc_issuer_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable or Disable the OIDC issuer URL. Defaults to false."
+}
+
+variable "workload_identity_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable or Disable Workload Identity. If enabled, oidc_issuer_enabled must be true. Defaults to false."
+}
+
 # Additional Node pools
 variable "node_pools" {
   type = map(object({
@@ -761,7 +775,11 @@ variable "open_service_mesh_enabled" {
 variable "key_vault_secrets_provider_enabled" {
   type        = bool
   default     = false
-  description = "(Optional) Whether to use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster. For more details: https://docs.microsoft.com/en-us/azure/aks/csi-secrets-store-driver"
+  description = <<EOF
+    (Optional) Whether to use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster.
+    If enabled, it creates an MSI for key vault, assigns it to the VMSS identity for key vault and assigns necessary
+    permissions to the key vault. For more details: https://docs.microsoft.com/en-us/azure/aks/csi-secrets-store-driver
+  EOF
   nullable    = false
 }
 
@@ -777,6 +795,19 @@ variable "secret_rotation_interval" {
   default     = "2m"
   description = "The interval to poll for secret rotation. This attribute is only set when `secret_rotation` is `true` and defaults to `2m`"
   nullable    = false
+}
+
+variable "enable_rbac_authorization" {
+  type        = bool
+  default     = false
+  description = "Enable Kubernetes Role-Based Access Control on the Key Vault"
+  nullable    = false
+}
+
+variable "key_vault_role_definition" {
+  description = "Role definition for the Key Vault. Default is `Key Vault Administrator`"
+  type        = string
+  default     = "Key Vault Administrator"
 }
 
 variable "sku_tier" {

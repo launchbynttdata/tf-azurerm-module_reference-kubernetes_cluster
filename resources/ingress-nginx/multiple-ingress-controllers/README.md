@@ -53,3 +53,22 @@ The below code shows the configuration metadata that differentiates one ingress 
 
 ### Public Ingress
 [Installation docs](./public-ingress/README.md)
+
+## Integrate the Ingress Controller with Linkerd
+
+We need to annotate the ingress deployment in order for Linkerd to inject its proxy sidecar. The below annotation is required for the ingress deployment
+```yaml
+controller:
+  podAnnotations:
+      linkerd.io/inject: enabled
+```
+
+When using helm, we need to upgrade the release with the below command
+```shell
+ helm upgrade public-ingress-nginx ingress-nginx/ingress-nginx \
+      --namespace public-ingress \
+      --reuse-values \
+      --set controller.podAnnotations."linkerd\.io/inject"=enabled
+```
+
+This configuration is applicable to both private and public ingress controllers, in fact any number and types of ingress controllers present in the cluster
