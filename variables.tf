@@ -132,7 +132,11 @@ variable "private_cluster_public_fqdn_enabled" {
 variable "private_dns_zone_id" {
   type        = string
   default     = null
-  description = "(Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster, `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving, otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created."
+  description = <<EOT
+    (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster or
+    `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving,
+    otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created.
+  EOT
 }
 
 variable "vnet_subnet_id" {

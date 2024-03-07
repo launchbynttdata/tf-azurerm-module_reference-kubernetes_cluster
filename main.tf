@@ -73,7 +73,7 @@ module "key_vault_role_assignment" {
 }
 
 module "aks" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster.git?ref=0.2.1"
+  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster.git?ref=0.3.0"
 
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                        = var.region

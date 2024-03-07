@@ -8,8 +8,8 @@
 This terraform module will provision an AKS cluster with other dependencies like Resource Group, Key Vault, ACR, etc. This is a collection module as it will encapsulate other primitive modules like `tf-azurerm-module_primitive-kubernetes_cluster`
 
 Some useful examples can be found in the [examples](./examples) directory that demonstrate the usage of this module to provision different flavors of AKS with different configurations and capabilities.
-1. [Private Cluster](./examples/private_cluster/README.md)
-2. [Public Cluster](./examples/public_cluster/README.md)
+1. [Private Cluster](./examples/private-cluster/README.md)
+2. [Public Cluster](./examples/public-cluster/README.md)
 
 There are also several other add-ons that can be deployed on the AKS cluster to provide additional functionalities. They are found
 in the [resources](./resources) directory. Few of the add ons are
@@ -21,6 +21,12 @@ in the [resources](./resources) directory. Few of the add ons are
 6. [Secrets Controller](./resources/secrets-controller)
 7. [Reloaders](./resources/reloaders)
 8. [Demo Applications](./resources/demo-apps)
+
+## Architecture
+The below diagram shows an architecture of a Private AKS clusters will all add-ons and integrations.
+
+![Architecture](./images/AKS-architecture.drawio.png)
+
 
 ## Pre-Commit hooks
 
@@ -118,13 +124,19 @@ If `make check` target is successful, developer is good to commit the code to pr
 - runs `conftests`. `conftests` make sure `policy` checks are successful.
 - runs `terratest`. This is integration test suit.
 - runs `opa` tests
+
+# References
+1. [Terraform Module](https://github.com/Azure/terraform-azurerm-aks)
+
+# Terradocs
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, <= 1.5.5 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >=3.67.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.67 |
 
 ## Providers
 
@@ -138,7 +150,7 @@ No providers.
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | git::https://github.com/nexient-llc/tf-azurerm-module-resource_group.git | 0.2.0 |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | git::https://github.com/nexient-llc/tf-azurerm-module-key_vault.git | 0.3.0 |
 | <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git | 0.1.0 |
-| <a name="module_aks"></a> [aks](#module\_aks) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster.git | 0.2.1 |
+| <a name="module_aks"></a> [aks](#module\_aks) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster.git | 0.3.0 |
 | <a name="module_acr"></a> [acr](#module\_acr) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-container_registry.git | 0.2.0 |
 | <a name="module_acr_role_assignment"></a> [acr\_role\_assignment](#module\_acr\_role\_assignment) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git | 0.1.0 |
 | <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git | 0.1.0 |
@@ -165,7 +177,7 @@ No resources.
 | <a name="input_network_policy"></a> [network\_policy](#input\_network\_policy) | (Optional) Sets up network policy to be used with Azure CNI. Network policy allows us to control the traffic flow between pods. Currently supported values are calico and azure. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_private_cluster_enabled"></a> [private\_cluster\_enabled](#input\_private\_cluster\_enabled) | If true cluster API server will be exposed only on internal IP address and available only in cluster vnet. | `bool` | `false` | no |
 | <a name="input_private_cluster_public_fqdn_enabled"></a> [private\_cluster\_public\_fqdn\_enabled](#input\_private\_cluster\_public\_fqdn\_enabled) | (Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to `false`. | `bool` | `false` | no |
-| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster, `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving, otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created. | `string` | `null` | no |
+| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster or<br>    `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving,<br>    otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_vnet_subnet_id"></a> [vnet\_subnet\_id](#input\_vnet\_subnet\_id) | (Optional) The ID of a Subnet where the Kubernetes Node Pool should exist. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_dns_service_ip"></a> [net\_profile\_dns\_service\_ip](#input\_net\_profile\_dns\_service\_ip) | (Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_outbound_type"></a> [net\_profile\_outbound\_type](#input\_net\_profile\_outbound\_type) | (Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer. | `string` | `"loadBalancer"` | no |

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: workload-identity-pod
+  namespace: default
+  labels:
+    azure.workload.identity/use: "true"  # Required, only the pods with this label can use workload identity
+spec:
+  serviceAccountName: workload-identity-sa
+  containers:
+    - image: launchbuildagent.azurecr.io/go-rest:v2
+      name: go-rest
+      ports:
+        - containerPort: 8080
+      env:
+        - name: AZURE_SUBSCRIPTION_ID
+          value: "e71eb3cd-83f2-46eb-8f47-3b779e27672f"  # Replace with your subscription ID
