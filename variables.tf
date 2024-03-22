@@ -901,6 +901,21 @@ variable "client_secret" {
   nullable    = false
 }
 
+variable "monitor_metrics" {
+  type = object({
+    annotations_allowed = optional(string)
+    labels_allowed      = optional(string)
+  })
+  default     = null
+  description = <<-EOT
+  (Optional) Specifies a Prometheus add-on profile for the Kubernetes Cluster
+  object({
+    annotations_allowed = "(Optional) Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric."
+    labels_allowed      = "(Optional) Specifies a Comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric."
+  })
+EOT
+}
+
 ## Container Registry related variables
 variable "container_registry_ids" {
   description = "List of container registry IDs to associate with AKS. This module will assign role `AcrPull` to AKS for these registries"

@@ -15,6 +15,11 @@ Microservices API gateways utilize mechanisms that enable service teams to easil
 team are responsible for their service, and will fix an issue if one occurs. A microservices gateway provides configurable monitoring for issue detection,
 and provides hooks for debugging, such as inspecting traffic or traffic shifting/duplication.
 
+## Emissary Request Flow
+The below diagram demonstrates how a client request is routed through the Emissary Ingress to the backend service.
+
+![Emissary Request Flow](../../images/Emissary-request-flow-diagram.jpg)
+
 ## Installation
 
 ```shell
@@ -347,6 +352,64 @@ Emissary supports many types of routing and traffic management features. Some of
 - Keepalive
 - Traffic Shadowing
 
+# Onboarding a new API
+
+As mentioned earlier Emissary is a self-service publishing API gateway. The below steps can be followed to onboard a new API.
+
+1. Deploy the API on the kubernetes. When using Helm for deployment, a new release can be created which in turn will deploy the API as a
+   kubernetes deployment. The deployment would be exposed as a service of type `ClusterIP`.
+2. Create a custom resource from the Emissary specific CRD `mapping`. Below is a simple mapping object that routes traffic to the API service.
+   ```yaml
+      apiVersion: getambassador.io/v3alpha1
+      kind: Mapping
+      metadata:
+       name: app1-mapping
+      spec:
+        hostname: "*"
+        prefix: /app1/
+        service: app1-service.app1-ns.svc.cluster.local
+   ```
+   Save the above mapping object in a file and apply it to the kubernetes cluster using `kubectl apply -f mapping.yaml`
+
+   The above mapping object will route traffic to the service `app1-service` deployed in the `app1-ns` when the path `/app1/` is hit on the emissary URL.
+3. Note that the above mapping is a very simple demonstration. The above mapping object can be further customized to include
+   other features like `circuit breaking`, `retries`, `load balancing`, `auth services` etc.
+
+# Enable Distributed Tracing
+
+Emissary supports distributed tracing to be enabled at the API Gateway. When enabled, Emissary will propagate the trace context
+to the upstream services and collect the traces from the services. The traces can be sent to a backend system like Jaeger, Zipkin, Lightstep etc.
+for visualization and analysis.
+
+Currently, Emissary only supports the below drivers
+- OpenTelemetry
+- DataDog
+- Zipkin
+
+We will show how to enable OpenTelemetry driver for distributed tracing. Assuming that the Otel Collector is already installed on the cluster,
+and is available at `otel-collector-opentelemetry-collector.default.svc.cluster.local:4317` (4317 is the `gRPC` Otel port), we need to create a custom resource of type
+`TracingService` to enable the OpenTelemetry driver.
+
+```yaml
+apiVersion: getambassador.io/v3alpha1
+kind: TracingService
+metadata:
+  name: tracing-otel
+  namespace: emissary
+spec:
+  service: otel-collector-opentelemetry-collector.default:4317
+  driver: opentelemetry
+```
+
+Once the above CR is applied, the Emissary will start sending traces to the Otel Collector. For more details on analysiys and visualization
+check the [Observability](../observability/README.md) section.
+
+**Note:** Only 1 TracingService per controller is supported at this time. Also, if this CR is created after the Emissary is installed,
+the Emissary will need to be restarted for the changes to take effect.
+
+```bash
+  kubectl  -n emissary rollout restart deploy
+```
 
 # References
 

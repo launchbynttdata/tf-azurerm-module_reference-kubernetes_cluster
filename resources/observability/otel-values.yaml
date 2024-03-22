@@ -1,0 +1,44 @@
+mode: "deployment"
+
+config:
+  receivers:
+    prometheus:
+      config:
+        scrape_configs:
+          - job_name: opentelemetry-collector
+            scrape_interval: 10s
+            static_configs:
+              - targets:
+                  - private-ingress-nginx-controller-metrics.private-ingress.svc.cluster.local:10254
+                  - emissary-ingress-admin.emissary.svc.cluster.local:8877
+                  - linkerd-dst-http.linkerd.svc.cluster.local:4191
+
+  exporters:
+    azuremonitor:
+      instrumentation_key: "<instrumentation-key>"
+  service:
+    pipelines:
+      traces:
+        receivers:
+          - otlp
+          - zipkin
+        exporters:
+          - azuremonitor
+          - logging
+      metrics:
+        receivers:
+          - otlp
+          - prometheus
+        exporters:
+          - azuremonitor
+          - logging
+livenessProbe:
+  initialDelaySeconds: 60
+readinessProbe:
+  initialDelaySeconds: 60
+ports:
+  metrics:
+    enabled: true
+
+service:
+  enabled: true

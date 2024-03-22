@@ -48,6 +48,9 @@ the associated private DNS zone.
       }
       EOF
    ```
+   ```shell
+      az keyvault secret set --vault-name fdoc-k8s-7215383580 --name "private-ingress-azure-config" --file azure.json
+    ```
 2. Create a secret using the above `azure.json`. This secret is consumed by `external-dns` module defined in step [3]
     ```
    kubectl create secret generic azure-config-file-private \
@@ -129,3 +132,9 @@ Since, this is a private DNS, we cannot `curl` the app.k8s.com from our local la
 
   curl app.k8s.com
   ```
+
+### Enable otel and metrics
+
+```shell
+helm upgrade private-ingress-nginx ingress-nginx/ingress-nginx -n private-ingress --reuse-values -f otel-values.yaml
+```

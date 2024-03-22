@@ -175,6 +175,8 @@ module "aks" {
   client_id     = var.client_id
   client_secret = var.client_secret
 
+  monitor_metrics = var.monitor_metrics
+
   agents_proximity_placement_group_id = var.agents_proximity_placement_group_id
 
   tags = merge(local.tags, {

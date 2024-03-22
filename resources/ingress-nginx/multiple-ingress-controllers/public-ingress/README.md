@@ -40,7 +40,8 @@ the associated public DNS zone.
       --set controller.ingressClassResource.controllerValue=k8s.io/public-ingress-nginx \
       --set controller.ingressClass=public-ingress \
       --set controller.ingressClassResource.name=public-ingress \
-      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
+      --set controller.allowSnippetAnnotations=true
 
    ```
 Once the deployment is successful, you can check the helm release using the command

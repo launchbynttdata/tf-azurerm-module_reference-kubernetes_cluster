@@ -156,8 +156,17 @@ Now, deploy a sample app and observe linkerd proxy getting auto-injected.
 ```shell
 kube apply -n linkerd-apps -f ./linkerd-apps
 ```
+## Expose Linkerd Metrics
 
-## Uninstall LinkerD
+The official documents provides multiple ways to export the metrics [expose metrics](https://linkerd.io/2.15/tasks/exporting-metrics/).
+
+However, none of the ways specified were found suitable for otel collector to scrape the metrics. The approach we used was
+to create a service [linkerd-dst-http](./linkerd-dst-http-service.yaml) which will expose the port `4191` for the linkerd-destination deployment. The otel collector can then
+use this service endpoint to scrape metrics `http://linkerd-dst-http.linkerd.svc.cluster.local:4191/metrics`
+
+The prometheus instance provided by `linkerd-viz` is throwing `403` while trying to scrape from the otel pod. May be some authorization policy is blocking the scrape. The above approach is a workaround to get the metrics.
+
+## Uninstall Linkerd
 
 Removing Linkerd from a Kubernetes cluster requires a few steps: removing any data plane proxies, removing all the extensions and then removing the core control plane.
 
@@ -187,3 +196,4 @@ linkerd uninstall | kubectl delete -f -
 - [LinkerD Official](https://linkerd.io/2.14/getting-started/)
 - [Auto rotate control plane TLS certs](https://linkerd.io/2.14/tasks/automatically-rotating-control-plane-tls-credentials/)
 - [Exposing Linkerd Dashboard](https://linkerd.io/2.14/tasks/exposing-dashboard/)
+- [Observability Linkerd](https://isitobservable.io/observability/service-mesh/what-is-linkerd-and-can-you-observe-it)

@@ -1,0 +1,12 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: python-rest-mapping
+spec:
+  hostname: "*"
+  prefix: /python/
+  service: python-rest
+  method: GET
+  add_linkerd_headers: true
+  docs:
+    path: "/.ambassador-internal/openapi-docs"

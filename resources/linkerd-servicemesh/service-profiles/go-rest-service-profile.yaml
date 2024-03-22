@@ -1,0 +1,44 @@
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  creationTimestamp: null
+  name: go-rest.default.svc.cluster.local
+  namespace: default
+spec:
+  routes:
+    - condition:
+        method: GET
+        pathRegex: /
+      name: GET /
+    - condition:
+        method: GET
+        pathRegex: /groups
+      name: GET /groups
+    - condition:
+        method: GET
+        pathRegex: /storage/[^/]*
+      name: GET /storage/{rg_name}
+    - condition:
+        method: GET
+        pathRegex: /resources/[^/]*
+      name: GET /resources/{rg_name}
+    - condition:
+        method: GET
+        pathRegex: /group/[^/]*
+      name: GET /group/{rg_name}
+#    - condition:
+#        method: POST
+#        pathRegex: /books
+#      name: POST /books
+#    - condition:
+#        method: GET
+#        pathRegex: /books/[^/]*
+#      name: GET /books/{id}
+#    - condition:
+#        method: POST
+#        pathRegex: /books/[^/]*/delete
+#      name: POST /books/{id}/delete
+#    - condition:
+#        method: POST
+#        pathRegex: /books/[^/]*/edit
+#      name: POST /books/{id}/edit

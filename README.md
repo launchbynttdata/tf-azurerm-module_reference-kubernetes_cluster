@@ -20,13 +20,17 @@ in the [resources](./resources) directory. Few of the add ons are
 5. [Cert Manager](./resources/cert-manager)
 6. [Secrets Controller](./resources/secrets-controller)
 7. [Reloaders](./resources/reloaders)
-8. [Demo Applications](./resources/demo-apps)
+8. [Observability](./resources/observability)
+9. [Demo Applications](./resources/demo-apps)
 
 ## Architecture
 The below diagram shows an architecture of a Private AKS clusters will all add-ons and integrations.
 
 ![Architecture](./images/AKS-architecture.drawio.png)
 
+## References
+1. [Draw IO diagram source](https://github.com/nexient-llc/fdoc-drawio)
+2. [Primitive module k8s](https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster)
 
 ## Pre-Commit hooks
 
@@ -253,6 +257,7 @@ No resources.
 | <a name="input_identity_type"></a> [identity\_type](#input\_identity\_type) | (Optional) The type of identity used for the managed cluster. Conflicts with `client_id` and `client_secret`. Possible values are `SystemAssigned` and `UserAssigned`. If `UserAssigned` is set, an `identity_ids` must be set as well. | `string` | `"SystemAssigned"` | no |
 | <a name="input_client_id"></a> [client\_id](#input\_client\_id) | (Optional) The Client ID (appId) for the Service Principal used for the AKS deployment | `string` | `""` | no |
 | <a name="input_client_secret"></a> [client\_secret](#input\_client\_secret) | (Optional) The Client Secret (password) for the Service Principal used for the AKS deployment | `string` | `""` | no |
+| <a name="input_monitor_metrics"></a> [monitor\_metrics](#input\_monitor\_metrics) | (Optional) Specifies a Prometheus add-on profile for the Kubernetes Cluster<br>object({<br>  annotations\_allowed = "(Optional) Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric."<br>  labels\_allowed      = "(Optional) Specifies a Comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric."<br>}) | <pre>object({<br>    annotations_allowed = optional(string)<br>    labels_allowed      = optional(string)<br>  })</pre> | `null` | no |
 | <a name="input_container_registry_ids"></a> [container\_registry\_ids](#input\_container\_registry\_ids) | List of container registry IDs to associate with AKS. This module will assign role `AcrPull` to AKS for these registries | `list(string)` | `[]` | no |
 | <a name="input_container_registry"></a> [container\_registry](#input\_container\_registry) | This will create a dedicated container registry for this AKS cluster | <pre>object({<br>    name                  = optional(string, "")<br>    admin_enabled         = bool<br>    sku                   = optional(string, "Basic")<br>    retention_policy_days = optional(number, 0)<br>  })</pre> | `null` | no |
 | <a name="input_kv_soft_delete_retention_days"></a> [kv\_soft\_delete\_retention\_days](#input\_kv\_soft\_delete\_retention\_days) | Number of retention days for soft delete for key vault | `number` | `7` | no |
