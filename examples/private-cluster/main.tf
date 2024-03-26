@@ -22,7 +22,7 @@ resource "random_password" "password" {
 }
 
 module "resource_names" {
-  source = "git::https://github.com/nexient-llc/tf-module-resource_name.git?ref=1.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.0"
 
   for_each = var.resource_names_map
 
@@ -36,7 +36,7 @@ module "resource_names" {
 }
 
 module "resource_group" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-resource_group.git?ref=0.2.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git?ref=1.0.0"
 
   name     = module.resource_names["rg"].standard
   location = var.region
@@ -46,7 +46,7 @@ module "resource_group" {
 }
 
 module "user_identity" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-user_managed_identity.git?ref=0.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git?ref=1.0.0"
 
   resource_group_name         = module.resource_group.name
   location                    = var.region
@@ -57,7 +57,7 @@ module "user_identity" {
 
 # This role assignment is required for AKS to access the VNet network
 module "rg_role_assignment" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git?ref=0.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
 
   scope                = module.resource_group.id
   role_definition_name = "Contributor"
@@ -67,7 +67,7 @@ module "rg_role_assignment" {
 }
 
 module "vnet" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-virtual_network.git?ref=0.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git?ref=1.0.0"
 
   resource_group_name                                   = module.resource_group.name
   vnet_name                                             = module.resource_names["vnet"].standard

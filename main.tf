@@ -11,7 +11,7 @@
 // limitations under the License.
 
 module "resource_names" {
-  source = "git::https://github.com/nexient-llc/tf-module-resource_name.git?ref=1.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.0"
 
   for_each = var.resource_names_map
 
@@ -26,7 +26,7 @@ module "resource_names" {
 }
 
 module "resource_group" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module-resource_group.git?ref=0.2.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git?ref=1.0.0"
 
   count = var.resource_group_name != null ? 0 : 1
 
@@ -37,7 +37,7 @@ module "resource_group" {
 }
 
 module "key_vault" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module-key_vault.git?ref=0.3.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-key_vault.git?ref=1.0.0"
 
   count = var.key_vault_secrets_provider_enabled ? 1 : 0
 
@@ -61,7 +61,7 @@ module "key_vault" {
 
 # Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
 module "key_vault_role_assignment" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git?ref=0.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
 
   count = var.key_vault_secrets_provider_enabled ? 1 : 0
 
@@ -73,7 +73,7 @@ module "key_vault_role_assignment" {
 }
 
 module "aks" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster.git?ref=0.3.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster.git?ref=1.0.0"
 
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                        = var.region
@@ -187,7 +187,7 @@ module "aks" {
 }
 
 module "acr" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-container_registry.git?ref=0.2.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-container_registry.git?ref=1.0.0"
 
   count = var.container_registry != null ? 1 : 0
 
@@ -207,7 +207,7 @@ module "acr" {
 }
 
 module "acr_role_assignment" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git?ref=0.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
 
   count = var.container_registry != null ? 1 : 0
 
@@ -217,7 +217,7 @@ module "acr_role_assignment" {
 }
 
 module "additional_acr_role_assignments" {
-  source = "git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git?ref=0.1.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
 
   for_each = toset(var.container_registry_ids)
 

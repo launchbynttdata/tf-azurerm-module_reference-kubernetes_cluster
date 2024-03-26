@@ -14,7 +14,7 @@ az role assignment create --role "AcrPull" --assignee $MSI_PRINCIPAL_ID --scope 
 ## Integrate with Private ACR
 Belows steps needs to be followed to integrate ACR privately with AKS.
 
-An example to provision a Private ACR using terraform is provided [here](https://github.com/nexient-llc/tf-azurerm-module_primitive-private_endpoint/blob/main/examples/acr-private-endpoint/main.tf)
+An example to provision a Private ACR using terraform is provided [here](https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_endpoint/blob/main/examples/acr-private-endpoint/main.tf)
 
 ### Provision an ACR
 Create an ACR with an `sku=Premium`. Private networking is only available in Premium tier

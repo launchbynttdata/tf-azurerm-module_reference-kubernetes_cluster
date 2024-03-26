@@ -1,4 +1,4 @@
-# tf-azurerm-module_ref-kubernetes_cluster
+# tf-azurerm-module_reference-kubernetes_cluster
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
@@ -29,8 +29,8 @@ The below diagram shows an architecture of a Private AKS clusters will all add-o
 ![Architecture](./images/AKS-architecture.drawio.png)
 
 ## References
-1. [Draw IO diagram source](https://github.com/nexient-llc/fdoc-drawio)
-2. [Primitive module k8s](https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster)
+1. [Draw IO diagram source](https://github.com/launchbynttdata/fdoc-drawio)
+2. [Primitive module k8s](https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster)
 
 ## Pre-Commit hooks
 
@@ -150,14 +150,14 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/nexient-llc/tf-module-resource_name.git | 1.1.0 |
-| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | git::https://github.com/nexient-llc/tf-azurerm-module-resource_group.git | 0.2.0 |
-| <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | git::https://github.com/nexient-llc/tf-azurerm-module-key_vault.git | 0.3.0 |
-| <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git | 0.1.0 |
-| <a name="module_aks"></a> [aks](#module\_aks) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-kubernetes_cluster.git | 0.3.0 |
-| <a name="module_acr"></a> [acr](#module\_acr) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-container_registry.git | 0.2.0 |
-| <a name="module_acr_role_assignment"></a> [acr\_role\_assignment](#module\_acr\_role\_assignment) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git | 0.1.0 |
-| <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | git::https://github.com/nexient-llc/tf-azurerm-module_primitive-role_assignment.git | 0.1.0 |
+| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git | 1.0.0 |
+| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git | 1.0.0 |
+| <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-key_vault.git | 1.0.0 |
+| <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_aks"></a> [aks](#module\_aks) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster.git | 1.0.0 |
+| <a name="module_acr"></a> [acr](#module\_acr) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-container_registry.git | 1.0.0 |
+| <a name="module_acr_role_assignment"></a> [acr\_role\_assignment](#module\_acr\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
 
 ## Resources
 
@@ -173,7 +173,7 @@ No resources.
 | <a name="input_environment_number"></a> [environment\_number](#input\_environment\_number) | The environment count for the respective environment. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_resource_number"></a> [resource\_number](#input\_resource\_number) | The resource count for the respective resource. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region in which the infra needs to be provisioned | `string` | `"eastus"` | no |
-| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-module-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "acr": {<br>    "max_length": 60,<br>    "name": "acr"<br>  },<br>  "aks": {<br>    "max_length": 60,<br>    "name": "aks"<br>  },<br>  "application_gateway": {<br>    "max_length": 60,<br>    "name": "appgtw"<br>  },<br>  "key_vault": {<br>    "max_length": 24,<br>    "name": "kv"<br>  },<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  }<br>}</pre> | no |
+| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "acr": {<br>    "max_length": 60,<br>    "name": "acr"<br>  },<br>  "aks": {<br>    "max_length": 60,<br>    "name": "aks"<br>  },<br>  "application_gateway": {<br>    "max_length": 60,<br>    "name": "appgtw"<br>  },<br>  "key_vault": {<br>    "max_length": 24,<br>    "name": "kv"<br>  },<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  }<br>}</pre> | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group in which the AKS cluster will be created. If not provided, this module will create one | `string` | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region | `string` | `"1.26"` | no |
 | <a name="input_network_plugin"></a> [network\_plugin](#input\_network\_plugin) | Network plugin to use for networking. Default is azure. | `string` | `"azure"` | no |

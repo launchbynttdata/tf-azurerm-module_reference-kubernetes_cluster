@@ -1,4 +1,4 @@
-module github.com/nexient-llc/tf-azurerm-module_ref-kubernetes_cluster
+module github.com/launchbynttdata/tf-azurerm-module_reference-kubernetes_cluster
 
 go 1.20
 
@@ -7,7 +7,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.7.0
 	github.com/gruntwork-io/terratest v0.43.12
-	github.com/nexient-llc/lcaf-component-terratest-common v1.0.1
+	github.com/launchbynttdata/lcaf-component-terratest v1.0.1
 	github.com/stretchr/testify v1.8.4
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/kops v1.28.3
