@@ -194,10 +194,9 @@ module "acr" {
   resource_group_name     = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                = var.region
   container_registry_name = length(var.container_registry.name) > 0 ? var.container_registry.name : module.resource_names["acr"].lower_case
-  container_registry = {
-    sku           = lookup(var.container_registry, "sku", "Basic")
-    admin_enabled = lookup(var.container_registry, "admin_enabled", false)
-  }
+  sku                     = "Basic"
+  admin_enabled           = false
+
   retention_policy = var.container_registry.retention_policy_days == 0 ? null : {
     days    = var.container_registry.retention_policy_days
     enabled = true
