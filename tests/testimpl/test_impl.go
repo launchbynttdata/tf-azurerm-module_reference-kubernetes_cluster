@@ -14,7 +14,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
-	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
+	httphelper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"gopkg.in/yaml.v2"
 	"k8s.io/kops/pkg/kubeconfig"
@@ -25,9 +25,9 @@ import (
 )
 
 func GetManagedClusterClient(t *testing.T, testContext types.TestContext) *armcontainerservice.ManagedClustersClient {
-	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
+	subscriptionID := os.Getenv("ARM_SUBSCRIPTION_ID")
 	if len(subscriptionID) == 0 {
-		t.Fatal("AZURE_SUBSCRIPTION_ID is not set in the environment variables ")
+		t.Fatal("ARM_SUBSCRIPTION_ID is not set in the environment variables ")
 	}
 	credential, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
@@ -193,7 +193,7 @@ func TestPublicCluster(t *testing.T, testContext types.TestContext) {
 		url := fmt.Sprintf("http://%s", serviceEndpoint)
 		fmt.Printf("Service Endpoint: %s\n", url)
 		tlsConfig := &tls.Config{}
-		http_helper.HttpGetWithRetryWithCustomValidation(t, url, tlsConfig, 10, 10*time.Second, func(statusCode int, body string) bool {
+		httphelper.HttpGetWithRetryWithCustomValidation(t, url, tlsConfig, 10, 10*time.Second, func(statusCode int, body string) bool {
 			isOk := statusCode == 200
 			isResponseBody := strings.Contains(body, "Hello World")
 

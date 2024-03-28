@@ -15,6 +15,11 @@ output "kube_config_raw" {
   sensitive = true
 }
 
+output "kube_admin_config_raw" {
+  value     = module.aks.kube_admin_config_raw
+  sensitive = true
+}
+
 output "cluster_name" {
   value = module.aks.cluster_name
 }
