@@ -165,15 +165,15 @@ variable "node_pool_identity_role_assignments" {
   default     = {}
 }
 
-# variable "private_dns_zone_id" {
-#   type        = string
-#   default     = null
-#   description = <<EOT
-#     (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster or
-#     `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving,
-#     otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created.
-#   EOT
-# }
+
+variable "dns_zone_suffix" {
+  description = <<EOT
+    The DNS Zone suffix for AKS Cluster private DNS Zone. Default is `azmk8s.io` for Public Cloud
+    For gov cloud it is `cx.aks.containerservice.azure.us`
+  EOT
+  type        = string
+  default     = "azmk8s.io"
+}
 
 variable "vnet_subnet_id" {
   type        = string
