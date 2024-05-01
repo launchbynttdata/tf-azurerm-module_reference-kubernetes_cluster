@@ -190,12 +190,32 @@ output "username" {
   value       = module.aks.username
 }
 
-output "acr_id" {
-  description = "ID of the ACR"
-  value       = try(module.acr[0].container_registry_id, "")
-}
-
 output "oidc_issuer_url" {
   description = "The OIDC issuer URL of the AKS cluster."
   value       = module.aks.oidc_issuer_url
+}
+
+output "private_cluster_dns_zone_id" {
+  description = "ID of the private DNS zone for the private cluster. Created only for private cluster"
+  value       = try(module.private_cluster_dns_zone[0].id, "")
+}
+
+output "private_cluster_dns_zone_name" {
+  description = "Name of the private DNS zone for the private cluster. Created only for private cluster"
+  value       = try(module.private_cluster_dns_zone[0].zone_name, "")
+}
+
+output "user_assigned_msi_object_id" {
+  description = "The object ID of the user assigned managed identity."
+  value       = try(module.cluster_identity[0].principal_id, "")
+}
+
+output "user_assigned_msi_client_id" {
+  description = "The client ID of the user assigned managed identity."
+  value       = try(module.cluster_identity[0].client_id, "")
+}
+
+output "additional_vnet_links" {
+  description = "The additional VNet links on the DNS zone of private AKS cluster."
+  value       = { for name, id in var.additional_vnet_links : name => module.vnet_links[name].id }
 }

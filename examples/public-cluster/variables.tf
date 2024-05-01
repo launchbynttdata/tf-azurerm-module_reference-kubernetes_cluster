@@ -48,7 +48,7 @@ variable "region" {
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.26"
+  default     = "1.28"
   description = "Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region"
 }
 

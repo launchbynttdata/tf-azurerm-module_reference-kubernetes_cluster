@@ -11,7 +11,7 @@
 // limitations under the License.
 
 module "resource_names" {
-  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.0"
+  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.1"
 
   for_each = var.resource_names_map
 
@@ -23,6 +23,8 @@ module "resource_names" {
   instance_env            = var.environment_number
   instance_resource       = var.resource_number
   maximum_length          = each.value.max_length
+  use_azure_region_abbr   = true
+
 }
 
 module "resource_group" {
@@ -39,13 +41,13 @@ module "resource_group" {
 module "key_vault" {
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-key_vault.git?ref=1.0.0"
 
-  count = var.key_vault_secrets_provider_enabled ? 1 : 0
+  count = var.create_key_vault ? 1 : 0
 
   resource_group = {
     name     = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
     location = var.region
   }
-  key_vault_name             = module.resource_names["key_vault"].minimal_random_suffix
+  key_vault_name             = module.resource_names["key_vault"].minimal
   enable_rbac_authorization  = var.enable_rbac_authorization
   soft_delete_retention_days = var.kv_soft_delete_retention_days
   sku_name                   = var.kv_sku
@@ -54,7 +56,7 @@ module "key_vault" {
   secrets                    = var.secrets
   keys                       = var.keys
 
-  custom_tags = local.tags
+  custom_tags = merge(local.tags, { resource_name = module.resource_names["key_vault"].standard })
 
   depends_on = [module.resource_group]
 }
@@ -63,13 +65,74 @@ module "key_vault" {
 module "key_vault_role_assignment" {
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
 
-  count = var.key_vault_secrets_provider_enabled ? 1 : 0
+  count = var.create_key_vault ? 1 : 0
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
   role_definition_name = var.key_vault_role_definition
   scope                = module.key_vault[0].key_vault_id
 
   depends_on = [module.aks, module.key_vault]
+}
+
+# The Key Vault MSI must be assigned Role to access the Key Vault from which AKS will retrieve the secrets.
+module "additional_key_vaults_role_assignment" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+
+  for_each = toset(var.additional_key_vault_ids)
+
+  principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
+  role_definition_name = var.key_vault_role_definition
+  scope                = each.key
+
+  depends_on = [module.aks, module.key_vault]
+}
+
+# Create a user-assigned managed identity for the AKS cluster
+module "cluster_identity" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git?ref=1.0.0"
+
+  count = var.identity_type == "UserAssigned" ? 1 : 0
+
+  resource_group_name         = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location                    = var.region
+  user_assigned_identity_name = module.resource_names["cluster_identity"].standard
+
+  depends_on = [module.resource_group]
+}
+
+module "private_cluster_dns_zone" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git?ref=1.0.0"
+
+  count = var.private_cluster_enabled ? 1 : 0
+
+  zone_name           = "${var.product_family}-${var.product_service}.private.${var.region}.azmk8s.io"
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  tags = local.tags
+
+  depends_on = [module.resource_group]
+}
+
+module "vnet_links" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git?ref=1.0.0"
+
+  for_each = var.private_cluster_enabled && length(var.additional_vnet_links) > 0 ? var.additional_vnet_links : {}
+
+  link_name             = each.key
+  resource_group_name   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_dns_zone_name = module.private_cluster_dns_zone[0].zone_name
+  virtual_network_id    = each.value
+  registration_enabled  = false
+
+  tags = local.tags
+
+  depends_on = [module.private_cluster_dns_zone, module.resource_group]
+}
+
+data "azurerm_resource_group" "rg" {
+  count = var.resource_group_name != null ? 1 : 0
+
+  name = var.resource_group_name
 }
 
 module "aks" {
@@ -83,7 +146,7 @@ module "aks" {
   network_policy                  = var.network_policy
   open_service_mesh_enabled       = var.open_service_mesh_enabled
   identity_type                   = var.identity_type
-  identity_ids                    = var.identity_ids
+  identity_ids                    = var.identity_type == "UserAssigned" ? concat([module.cluster_identity[0].id], var.identity_ids) : null
   kubernetes_version              = var.kubernetes_version
   cluster_name                    = module.resource_names["aks"].dns_compliant_minimal
   api_server_subnet_id            = var.api_server_subnet_id
@@ -113,7 +176,7 @@ module "aks" {
   # Private cluster configuration
   private_cluster_enabled             = var.private_cluster_enabled
   private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
-  private_dns_zone_id                 = var.private_dns_zone_id
+  private_dns_zone_id                 = var.private_cluster_enabled ? module.private_cluster_dns_zone[0].id : null
   vnet_subnet_id                      = var.vnet_subnet_id
   pod_subnet_id                       = var.pod_subnet_id
   net_profile_outbound_type           = var.net_profile_outbound_type
@@ -183,36 +246,32 @@ module "aks" {
     resource_name = module.resource_names["aks"].standard
   })
 
-  depends_on = [module.resource_group]
+  depends_on = [module.resource_group, module.private_cluster_dns_zone, module.cluster_identity]
 }
 
-module "acr" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-container_registry.git?ref=1.0.0"
-
-  count = var.container_registry != null ? 1 : 0
-
-  resource_group_name     = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
-  location                = var.region
-  container_registry_name = length(var.container_registry.name) > 0 ? var.container_registry.name : module.resource_names["acr"].lower_case
-  sku                     = "Basic"
-  admin_enabled           = false
-
-  retention_policy = var.container_registry.retention_policy_days == 0 ? null : {
-    days    = var.container_registry.retention_policy_days
-    enabled = true
-  }
-
-  tags = merge(local.tags, { resource_name = module.resource_names["acr"].standard })
-}
-
-module "acr_role_assignment" {
+# Assign the cluster identity the required roles on RG and VNet
+module "cluster_identity_roles" {
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
 
-  count = var.container_registry != null ? 1 : 0
+  for_each = local.cluster_identity_role_assignments
+
+  principal_id         = module.cluster_identity[0].principal_id
+  role_definition_name = each.value[0]
+  scope                = each.value[1]
+
+  depends_on = [module.cluster_identity, module.resource_group]
+}
+
+module "node_pool_identity_roles" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+
+  for_each = var.node_pool_identity_role_assignments
 
   principal_id         = module.aks.kubelet_identity[0].object_id
-  role_definition_name = "AcrPull"
-  scope                = module.acr[0].container_registry_id
+  role_definition_name = each.value[0]
+  scope                = each.value[1]
+
+  depends_on = [module.aks, module.resource_group]
 }
 
 module "additional_acr_role_assignments" {

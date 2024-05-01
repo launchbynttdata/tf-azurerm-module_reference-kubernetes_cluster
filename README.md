@@ -140,28 +140,37 @@ If `make check` target is successful, developer is good to commit the code to pr
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, <= 1.5.5 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.67 |
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.97.1 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git | 1.0.0 |
+| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git | 1.0.1 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git | 1.0.0 |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-key_vault.git | 1.0.0 |
 | <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_cluster_identity"></a> [cluster\_identity](#module\_cluster\_identity) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git | 1.0.0 |
+| <a name="module_private_cluster_dns_zone"></a> [private\_cluster\_dns\_zone](#module\_private\_cluster\_dns\_zone) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git | 1.0.0 |
+| <a name="module_vnet_links"></a> [vnet\_links](#module\_vnet\_links) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git | 1.0.0 |
 | <a name="module_aks"></a> [aks](#module\_aks) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster.git | 1.0.0 |
-| <a name="module_acr"></a> [acr](#module\_acr) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-container_registry.git | 1.0.0 |
-| <a name="module_acr_role_assignment"></a> [acr\_role\_assignment](#module\_acr\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_cluster_identity_roles"></a> [cluster\_identity\_roles](#module\_cluster\_identity\_roles) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
 | <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 
 ## Inputs
 
@@ -173,7 +182,7 @@ No resources.
 | <a name="input_environment_number"></a> [environment\_number](#input\_environment\_number) | The environment count for the respective environment. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_resource_number"></a> [resource\_number](#input\_resource\_number) | The resource count for the respective resource. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region in which the infra needs to be provisioned | `string` | `"eastus"` | no |
-| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "acr": {<br>    "max_length": 60,<br>    "name": "acr"<br>  },<br>  "aks": {<br>    "max_length": 60,<br>    "name": "aks"<br>  },<br>  "application_gateway": {<br>    "max_length": 60,<br>    "name": "appgtw"<br>  },<br>  "key_vault": {<br>    "max_length": 24,<br>    "name": "kv"<br>  },<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  }<br>}</pre> | no |
+| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "acr": {<br>    "max_length": 60,<br>    "name": "acr"<br>  },<br>  "aks": {<br>    "max_length": 60,<br>    "name": "aks"<br>  },<br>  "application_gateway": {<br>    "max_length": 60,<br>    "name": "appgtw"<br>  },<br>  "cluster_identity": {<br>    "max_length": 60,<br>    "name": "msi"<br>  },<br>  "key_vault": {<br>    "max_length": 24,<br>    "name": "kv"<br>  },<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  }<br>}</pre> | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group in which the AKS cluster will be created. If not provided, this module will create one | `string` | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region | `string` | `"1.26"` | no |
 | <a name="input_network_plugin"></a> [network\_plugin](#input\_network\_plugin) | Network plugin to use for networking. Default is azure. | `string` | `"azure"` | no |
@@ -181,7 +190,9 @@ No resources.
 | <a name="input_network_policy"></a> [network\_policy](#input\_network\_policy) | (Optional) Sets up network policy to be used with Azure CNI. Network policy allows us to control the traffic flow between pods. Currently supported values are calico and azure. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_private_cluster_enabled"></a> [private\_cluster\_enabled](#input\_private\_cluster\_enabled) | If true cluster API server will be exposed only on internal IP address and available only in cluster vnet. | `bool` | `false` | no |
 | <a name="input_private_cluster_public_fqdn_enabled"></a> [private\_cluster\_public\_fqdn\_enabled](#input\_private\_cluster\_public\_fqdn\_enabled) | (Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to `false`. | `bool` | `false` | no |
-| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster or<br>    `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving,<br>    otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created. | `string` | `null` | no |
+| <a name="input_additional_vnet_links"></a> [additional\_vnet\_links](#input\_additional\_vnet\_links) | A list of VNET IDs for which vnet links to be created with the private AKS cluster DNS Zone. Applicable only when private\_cluster\_enabled is true. | `map(string)` | `{}` | no |
+| <a name="input_cluster_identity_role_assignments"></a> [cluster\_identity\_role\_assignments](#input\_cluster\_identity\_role\_assignments) | A map of role assignments to be associated with the cluster identity<br>    Should be of the format<br>    {<br>      private-dns = ["Private DNS Zone Contributor", "<private-dns-zone-id>"]<br>      dns = ["DNS Zone Contributor", "<dns-zone-id>"]<br>    } | `map(list(string))` | `{}` | no |
+| <a name="input_node_pool_identity_role_assignments"></a> [node\_pool\_identity\_role\_assignments](#input\_node\_pool\_identity\_role\_assignments) | A map of role assignments to be associated with the node-pool identity<br>    Should be of the format<br>    {<br>      private-dns = ["Private DNS Zone Contributor", "<private-dns-zone-id>"]<br>      dns = ["DNS Zone Contributor", "<dns-zone-id>"]<br>    } | `map(list(string))` | `{}` | no |
 | <a name="input_vnet_subnet_id"></a> [vnet\_subnet\_id](#input\_vnet\_subnet\_id) | (Optional) The ID of a Subnet where the Kubernetes Node Pool should exist. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_dns_service_ip"></a> [net\_profile\_dns\_service\_ip](#input\_net\_profile\_dns\_service\_ip) | (Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_outbound_type"></a> [net\_profile\_outbound\_type](#input\_net\_profile\_outbound\_type) | (Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer. | `string` | `"loadBalancer"` | no |
@@ -244,8 +255,10 @@ No resources.
 | <a name="input_key_vault_secrets_provider_enabled"></a> [key\_vault\_secrets\_provider\_enabled](#input\_key\_vault\_secrets\_provider\_enabled) | (Optional) Whether to use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster.<br>    If enabled, it creates an MSI for key vault, assigns it to the VMSS identity for key vault and assigns necessary<br>    permissions to the key vault. For more details: https://docs.microsoft.com/en-us/azure/aks/csi-secrets-store-driver | `bool` | `false` | no |
 | <a name="input_secret_rotation_enabled"></a> [secret\_rotation\_enabled](#input\_secret\_rotation\_enabled) | Is secret rotation enabled? This variable is only used when `key_vault_secrets_provider_enabled` is `true` and defaults to `false` | `bool` | `false` | no |
 | <a name="input_secret_rotation_interval"></a> [secret\_rotation\_interval](#input\_secret\_rotation\_interval) | The interval to poll for secret rotation. This attribute is only set when `secret_rotation` is `true` and defaults to `2m` | `string` | `"2m"` | no |
+| <a name="input_create_key_vault"></a> [create\_key\_vault](#input\_create\_key\_vault) | Create a new Key Vault to be associated with the AKS cluster | `bool` | `false` | no |
+| <a name="input_key_vault_role_definition"></a> [key\_vault\_role\_definition](#input\_key\_vault\_role\_definition) | Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator` | `string` | `"Key Vault Administrator"` | no |
+| <a name="input_additional_key_vault_ids"></a> [additional\_key\_vault\_ids](#input\_additional\_key\_vault\_ids) | IDs of the additional key vaults to be associated with the AKS cluster. The key vault MSI will be assigned<br>    the role defined in `key_vault_role_definition` on these key vaults. | `list(string)` | `[]` | no |
 | <a name="input_enable_rbac_authorization"></a> [enable\_rbac\_authorization](#input\_enable\_rbac\_authorization) | Enable Kubernetes Role-Based Access Control on the Key Vault | `bool` | `false` | no |
-| <a name="input_key_vault_role_definition"></a> [key\_vault\_role\_definition](#input\_key\_vault\_role\_definition) | Role definition for the Key Vault. Default is `Key Vault Administrator` | `string` | `"Key Vault Administrator"` | no |
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | The SKU Tier that should be used for this Kubernetes Cluster. Possible values are `Free` and `Standard` | `string` | `"Free"` | no |
 | <a name="input_node_resource_group"></a> [node\_resource\_group](#input\_node\_resource\_group) | The auto-generated Resource Group which contains the resources for this Managed Kubernetes Cluster. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_ingress_application_gateway_enabled"></a> [ingress\_application\_gateway\_enabled](#input\_ingress\_application\_gateway\_enabled) | Whether to deploy the Application Gateway ingress controller to this Kubernetes Cluster? | `bool` | `false` | no |
@@ -253,13 +266,12 @@ No resources.
 | <a name="input_ingress_application_gateway_subnet_cidr"></a> [ingress\_application\_gateway\_subnet\_cidr](#input\_ingress\_application\_gateway\_subnet\_cidr) | The subnet CIDR to be used to create an Application Gateway, which in turn will be integrated with the ingress controller of this Kubernetes Cluster. | `string` | `null` | no |
 | <a name="input_ingress_application_gateway_subnet_id"></a> [ingress\_application\_gateway\_subnet\_id](#input\_ingress\_application\_gateway\_subnet\_id) | The ID of the subnet on which to create an Application Gateway, which in turn will be integrated with the ingress controller of this Kubernetes Cluster. | `string` | `null` | no |
 | <a name="input_web_app_routing"></a> [web\_app\_routing](#input\_web\_app\_routing) | object({<br>  dns\_zone\_id = "(Required) Specifies the ID of the DNS Zone in which DNS entries are created for applications deployed to the cluster when Web App Routing is enabled."<br>}) | <pre>object({<br>    dns_zone_id = string<br>  })</pre> | `null` | no |
-| <a name="input_identity_ids"></a> [identity\_ids](#input\_identity\_ids) | (Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster. | `list(string)` | `null` | no |
+| <a name="input_identity_ids"></a> [identity\_ids](#input\_identity\_ids) | (Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster. | `list(string)` | `[]` | no |
 | <a name="input_identity_type"></a> [identity\_type](#input\_identity\_type) | (Optional) The type of identity used for the managed cluster. Conflicts with `client_id` and `client_secret`. Possible values are `SystemAssigned` and `UserAssigned`. If `UserAssigned` is set, an `identity_ids` must be set as well. | `string` | `"SystemAssigned"` | no |
 | <a name="input_client_id"></a> [client\_id](#input\_client\_id) | (Optional) The Client ID (appId) for the Service Principal used for the AKS deployment | `string` | `""` | no |
 | <a name="input_client_secret"></a> [client\_secret](#input\_client\_secret) | (Optional) The Client Secret (password) for the Service Principal used for the AKS deployment | `string` | `""` | no |
 | <a name="input_monitor_metrics"></a> [monitor\_metrics](#input\_monitor\_metrics) | (Optional) Specifies a Prometheus add-on profile for the Kubernetes Cluster<br>object({<br>  annotations\_allowed = "(Optional) Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric."<br>  labels\_allowed      = "(Optional) Specifies a Comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric."<br>}) | <pre>object({<br>    annotations_allowed = optional(string)<br>    labels_allowed      = optional(string)<br>  })</pre> | `null` | no |
 | <a name="input_container_registry_ids"></a> [container\_registry\_ids](#input\_container\_registry\_ids) | List of container registry IDs to associate with AKS. This module will assign role `AcrPull` to AKS for these registries | `list(string)` | `[]` | no |
-| <a name="input_container_registry"></a> [container\_registry](#input\_container\_registry) | This will create a dedicated container registry for this AKS cluster | <pre>object({<br>    name                  = optional(string, "")<br>    admin_enabled         = bool<br>    sku                   = optional(string, "Basic")<br>    retention_policy_days = optional(number, 0)<br>  })</pre> | `null` | no |
 | <a name="input_kv_soft_delete_retention_days"></a> [kv\_soft\_delete\_retention\_days](#input\_kv\_soft\_delete\_retention\_days) | Number of retention days for soft delete for key vault | `number` | `7` | no |
 | <a name="input_kv_sku"></a> [kv\_sku](#input\_kv\_sku) | SKU for the key vault - standard or premium | `string` | `"standard"` | no |
 | <a name="input_kv_access_policies"></a> [kv\_access\_policies](#input\_kv\_access\_policies) | Additional Access policies for the vault except the current user which are added by default | <pre>map(object({<br>    object_id               = string<br>    tenant_id               = string<br>    key_permissions         = list(string)<br>    certificate_permissions = list(string)<br>    secret_permissions      = list(string)<br>    storage_permissions     = list(string)<br>  }))</pre> | `{}` | no |
@@ -304,6 +316,10 @@ No resources.
 | <a name="output_network_profile"></a> [network\_profile](#output\_network\_profile) | The `azurerm_kubernetes_cluster`'s `network_profile` block |
 | <a name="output_password"></a> [password](#output\_password) | The `password` in the `azurerm_kubernetes_cluster`'s `kube_config` block. A password or token used to authenticate to the Kubernetes cluster. |
 | <a name="output_username"></a> [username](#output\_username) | The `username` in the `azurerm_kubernetes_cluster`'s `kube_config` block. A username used to authenticate to the Kubernetes cluster. |
-| <a name="output_acr_id"></a> [acr\_id](#output\_acr\_id) | ID of the ACR |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | The OIDC issuer URL of the AKS cluster. |
+| <a name="output_private_cluster_dns_zone_id"></a> [private\_cluster\_dns\_zone\_id](#output\_private\_cluster\_dns\_zone\_id) | ID of the private DNS zone for the private cluster. Created only for private cluster |
+| <a name="output_private_cluster_dns_zone_name"></a> [private\_cluster\_dns\_zone\_name](#output\_private\_cluster\_dns\_zone\_name) | Name of the private DNS zone for the private cluster. Created only for private cluster |
+| <a name="output_user_assigned_msi_object_id"></a> [user\_assigned\_msi\_object\_id](#output\_user\_assigned\_msi\_object\_id) | The object ID of the user assigned managed identity. |
+| <a name="output_user_assigned_msi_client_id"></a> [user\_assigned\_msi\_client\_id](#output\_user\_assigned\_msi\_client\_id) | The client ID of the user assigned managed identity. |
+| <a name="output_additional_vnet_links"></a> [additional\_vnet\_links](#output\_additional\_vnet\_links) | The additional VNet links on the DNS zone of private AKS cluster. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

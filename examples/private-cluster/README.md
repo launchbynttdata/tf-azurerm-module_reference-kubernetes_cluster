@@ -46,6 +46,13 @@ az role assignment create --role "Private DNS Zone Contributor" --assignee $MSI_
 az role assignment create --role "Network Contributor" --assignee $MSI_PRINCIPAL_ID --scope $PRIVATE_ZONE_ID
 ```
 
+We may also need to add additional roles to the MSI for it to be able to create a Vnet Link on the k8s VNet
+```bash
+# This step was not provided in the documentation but I got failure while creating AKS cluster
+VNET_ID=$(az network vnet show -g $VNET_RG -n $VNET_NAME --query "id" -o tsv)
+az role assignment create --role "Network Contributor" --assignee $MSI_PRINCIPAL_ID --scope $VNET_ID
+```
+
 **Note:** In the event your VMs are in a different VNet than the AKS, you need to link the VM VNet to the private DNS zone as well.
 
 
@@ -56,7 +63,7 @@ Some solutions
 - create a VM in the same vnet, login into that vm using ssh and access the k8s cluster from there
 - Create VNet peering between the Vnet containing the VM and k8s Vnet. Make sure to link the Private DNS zone to the VM Vnet in addition to the peering connection.
 
-# Public Ingress
+## Public Ingress
 
 By default, an AKS creates a public load balancer named `kubernetes` that is used as an entry point for any kubernetes service that has a `net_profile_outbound_type=LoadBalancer`. Azure creates
 this load balancer for the purpose of egress traffic going out of the cluster. But the same LoadBalancer gets used for Ingress purposes as well.
@@ -76,7 +83,7 @@ service.beta.kubernetes.io/azure-load-balancer-internal: "true"
 service.beta.kubernetes.io/azure-load-balancer-internal-subnet: ing-1-subnet
 ```
 
-# Multi AZ Node pool
+## Multi AZ Node pool
 
 If we want to ensure that the node pools spread across multiple availability zones, we can set the input variable `agents_availability_zones` to a list of availability zones.
 For example, `agents_availability_zones = [1,2]`
@@ -88,6 +95,61 @@ Name:               aks-default-41892607-vmss000000
 Name:               aks-default-41892607-vmss000001
                     topology.kubernetes.io/zone=eastus-1
 ```
+
+# Deploy Private AKS cluster from scratch
+
+This section describes how to deploy a private AKS cluster in a custom VNet and a custom DNS Zone for the API server.
+
+We need to set up the following infrastructure in the chronological order
+
+1. Create a Resource Group. In a Hub & Spoke architecture, this would be the `Spoke` resource group. This resource group
+    will contain the AKS cluster, VNET, Subnets, MSI and other resources. AKS anyways will create a separate resource group
+    automatically for the node pools.
+2. Create a VNet. This Vnet will be passed in as input the AKS cluster. The VNet is where the node pools will be associated with.
+    Currently, the AKS API server will be created in a VNet managed by Azure. However, Azure will create a private endpoint for the AKS
+    server in this VNet. In the future versions of AKS, there will be provision the AKS API server in a custom VNet (this is a beta feature now)
+
+    Create multiple subnets in the VNet. One subnet for each application node pool and one for the system node pool
+    - Subnet for System Node pool
+    - Subnet for App Node pool 1
+    - Subnet for App Node pool 2
+    - Subnet for App Node pool N
+    - Subnet for ACR (Optional): This is required if you want to have a private ACR for this k8s cluster. A separate subnet is required
+        to create a private endpoint for the ACR as per the official documentation. Note: You can have a common ACR in the hub
+        VNet and can be peered with this spoke VNet also.
+    - Subnet for Bastion Hosts (Optional): You can have a dedicated subnet for Bastion hosts to access the private AKS cluster.
+3. Private DNS Zone for the AKS API Server: This is required to resolve the private IP of the AKS API server. The private DNS zone
+    must be of the format `<sub_zone>.private.<region>.azmk8s.io`. The private DNS zone must be linked to the VNet where the AKS API server
+    is provisioned and any other VNets which would access this zone. The VNet must be peered with the VNet where the bastion VMs are provisioned.
+4. Create a User Assigned Managed Identity. This identity will be used by the AKS cluster to manage the resources in the VNet.
+    The identity must be assigned `Contributor` role on the VNet and the private DNS zone. See the above sections for more details
+5. Private AKS (Optional): This must have a private endpoint for the AKS VNet.
+6. Microsoft Entra ID AD Group (Optional): When AD integration is enabled, the AKS cluster must be associated with at least one
+    AD Group which will have admin access on the AKS cluster
+7. AKS Cluster: Private AKS cluster with the above resources passed in as inputs. The AKS cluster must be associated with the VNet
+    and the custom DNS Zone. The AKS cluster must be associated with the User Assigned Managed Identity. The AKS cluster must be associated
+    with the AD Group for AD integration.
+
+## Access the private AKS cluster
+In absence of VPN connection, you must have a VM (acting as bastion) either in the same VNet as the AKS or in a peered VNet.
+In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the AKS cluster (API Server).
+
+- Download the kubeconfig file from the AKS cluster
+  ```bash
+    RG_NAME="dso-k8s-001"
+    AKS_CLUSTER_NAME="dso-ado-k8s-dev-001-aks"
+    az aks get-credentials --resource-group $RG_NAME --name $AKS_CLUSTER_NAME -f > ~/aks-config
+  ```
+- Copy to the bastion host
+    ```bash
+        scp ~/aks-config azureuser@<bastion-host>:~/aks-config
+    ```
+- Install `kubectl` on the bastion host
+- Set the `KUBECONFIG` environment variable to the kubeconfig file
+  ```bash
+      export KUBECONFIG=~/aks-config
+  ```
+- Run `kubectl get nodes` to see the nodes in the cluster
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -102,16 +164,14 @@ Name:               aks-default-41892607-vmss000001
 
 | Name | Version |
 |------|---------|
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.6.1 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git | 1.0.0 |
+| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git | 1.0.1 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git | 1.0.0 |
-| <a name="module_user_identity"></a> [user\_identity](#module\_user\_identity) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git | 1.0.0 |
-| <a name="module_rg_role_assignment"></a> [rg\_role\_assignment](#module\_rg\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
 | <a name="module_vnet"></a> [vnet](#module\_vnet) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git | 1.0.0 |
 | <a name="module_aks"></a> [aks](#module\_aks) | ../.. | n/a |
 
@@ -144,7 +204,6 @@ Name:               aks-default-41892607-vmss000001
 | <a name="input_os_disk_size_gb"></a> [os\_disk\_size\_gb](#input\_os\_disk\_size\_gb) | Disk size of nodes in GBs. | `number` | `30` | no |
 | <a name="input_identity_type"></a> [identity\_type](#input\_identity\_type) | (Optional) The type of identity used for the managed cluster. Conflicts with `client_id` and `client_secret`. Possible values are `SystemAssigned` and `UserAssigned`. If `UserAssigned` is set, an `identity_ids` must be set as well. | `string` | `"SystemAssigned"` | no |
 | <a name="input_private_cluster_enabled"></a> [private\_cluster\_enabled](#input\_private\_cluster\_enabled) | If true cluster API server will be exposed only on internal IP address and available only in cluster vnet. | `bool` | `false` | no |
-| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster, `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving, otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_dns_service_ip"></a> [net\_profile\_dns\_service\_ip](#input\_net\_profile\_dns\_service\_ip) | (Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_outbound_type"></a> [net\_profile\_outbound\_type](#input\_net\_profile\_outbound\_type) | (Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer. | `string` | `"loadBalancer"` | no |
 | <a name="input_net_profile_pod_cidr"></a> [net\_profile\_pod\_cidr](#input\_net\_profile\_pod\_cidr) | (Optional) The CIDR to use for pod IP addresses. This field can only be set when network\_plugin is set to kubenet. Changing this forces a new resource to be created. | `string` | `null` | no |
