@@ -101,12 +101,27 @@ make env
 
 **Pre-requisites**
 Before running this target it is important to ensure that, developer has created files mentioned below on local workstation under root directory of git repository that contains code for primitives/segments. Note that these files are `azure` specific. If primitive/segment under development uses any other cloud provider than azure, this section may not be relevant.
-
+- Login to Azure cli
+- Export the below environment variables
+```bash
+export ARM_ENVIRONMENT=<public|usgovernment>
+export ARM_SUBSCRIPTION_ID=<subscription_id>
+```
 - A file named `provider.tf` with contents below
 
 ```
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+  skip_provider_registration = true
+}
+
+provider "azapi" {
+  use_cli     = true
+  use_msi     = false
 }
 ```
 
@@ -147,7 +162,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.97.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.101.0 |
 
 ## Modules
 
@@ -193,6 +208,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="input_additional_vnet_links"></a> [additional\_vnet\_links](#input\_additional\_vnet\_links) | A list of VNET IDs for which vnet links to be created with the private AKS cluster DNS Zone. Applicable only when private\_cluster\_enabled is true. | `map(string)` | `{}` | no |
 | <a name="input_cluster_identity_role_assignments"></a> [cluster\_identity\_role\_assignments](#input\_cluster\_identity\_role\_assignments) | A map of role assignments to be associated with the cluster identity<br>    Should be of the format<br>    {<br>      private-dns = ["Private DNS Zone Contributor", "<private-dns-zone-id>"]<br>      dns = ["DNS Zone Contributor", "<dns-zone-id>"]<br>    } | `map(list(string))` | `{}` | no |
 | <a name="input_node_pool_identity_role_assignments"></a> [node\_pool\_identity\_role\_assignments](#input\_node\_pool\_identity\_role\_assignments) | A map of role assignments to be associated with the node-pool identity<br>    Should be of the format<br>    {<br>      private-dns = ["Private DNS Zone Contributor", "<private-dns-zone-id>"]<br>      dns = ["DNS Zone Contributor", "<dns-zone-id>"]<br>    } | `map(list(string))` | `{}` | no |
+| <a name="input_dns_zone_suffix"></a> [dns\_zone\_suffix](#input\_dns\_zone\_suffix) | The DNS Zone suffix for AKS Cluster private DNS Zone. Default is `azmk8s.io` for Public Cloud<br>    For gov cloud it is `cx.aks.containerservice.azure.us` | `string` | `"azmk8s.io"` | no |
 | <a name="input_vnet_subnet_id"></a> [vnet\_subnet\_id](#input\_vnet\_subnet\_id) | (Optional) The ID of a Subnet where the Kubernetes Node Pool should exist. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_dns_service_ip"></a> [net\_profile\_dns\_service\_ip](#input\_net\_profile\_dns\_service\_ip) | (Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_net_profile_outbound_type"></a> [net\_profile\_outbound\_type](#input\_net\_profile\_outbound\_type) | (Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer. | `string` | `"loadBalancer"` | no |

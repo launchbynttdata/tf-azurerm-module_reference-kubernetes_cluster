@@ -105,7 +105,7 @@ module "private_cluster_dns_zone" {
 
   count = var.private_cluster_enabled ? 1 : 0
 
-  zone_name           = "${var.product_family}-${var.product_service}.private.${var.region}.azmk8s.io"
+  zone_name           = "${var.product_family}-${var.product_service}.private.${var.region}.${var.dns_zone_suffix}"
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
 
   tags = local.tags
