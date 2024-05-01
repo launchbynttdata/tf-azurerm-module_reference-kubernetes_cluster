@@ -22,7 +22,7 @@ resource "random_password" "password" {
 }
 
 module "resource_names" {
-  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.0"
+  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.1"
 
   for_each = var.resource_names_map
 
@@ -33,6 +33,7 @@ module "resource_names" {
   cloud_resource_type     = each.value.name
   instance_env            = var.environment_number
   maximum_length          = each.value.max_length
+  use_azure_region_abbr   = true
 }
 
 module "resource_group" {
@@ -43,27 +44,6 @@ module "resource_group" {
 
   tags = merge(var.tags, { resource_name = module.resource_names["rg"].standard })
 
-}
-
-module "user_identity" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git?ref=1.0.0"
-
-  resource_group_name         = module.resource_group.name
-  location                    = var.region
-  user_assigned_identity_name = module.resource_names["msi"].standard
-
-  depends_on = [module.resource_group]
-}
-
-# This role assignment is required for AKS to access the VNet network
-module "rg_role_assignment" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
-
-  scope                = module.resource_group.id
-  role_definition_name = "Contributor"
-  principal_id         = module.user_identity.principal_id
-
-  depends_on = [module.resource_group, module.user_identity]
 }
 
 module "vnet" {
@@ -100,14 +80,11 @@ module "aks" {
   product_service    = var.product_service
   environment        = var.environment
   environment_number = var.environment_number
-
-  region = var.region
+  region             = var.region
 
   resource_group_name = module.resource_group.name
 
   private_cluster_enabled = var.private_cluster_enabled
-  # Private DNS is managed by Azure
-  private_dns_zone_id = var.private_dns_zone_id
 
   kubernetes_version        = var.kubernetes_version
   network_plugin            = var.network_plugin
@@ -120,6 +97,7 @@ module "aks" {
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   secret_rotation_enabled            = var.secret_rotation_enabled
   secret_rotation_interval           = var.secret_rotation_interval
+
   node_pools = {
     apppool1 = {
       name       = "apppool1"
@@ -152,10 +130,9 @@ module "aks" {
   net_profile_pod_cidr       = var.net_profile_pod_cidr
 
   identity_type = var.identity_type
-  identity_ids  = [module.user_identity.id]
 
   tags = var.tags
 
-  depends_on = [module.vnet, module.user_identity]
+  depends_on = [module.vnet]
 
 }

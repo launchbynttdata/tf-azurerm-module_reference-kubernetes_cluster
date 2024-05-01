@@ -9,7 +9,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-product_family  = "deb"
+product_family  = "dso"
 product_service = "pub"
 agents_size     = "Standard_D2_v2"
 

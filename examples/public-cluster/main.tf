@@ -23,8 +23,7 @@ module "aks" {
   product_service    = var.product_service
   environment        = var.environment
   environment_number = var.environment_number
-
-  region = var.region
+  region             = var.region
 
   node_pools = var.node_pools
 

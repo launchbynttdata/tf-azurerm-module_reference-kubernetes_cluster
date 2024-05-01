@@ -81,6 +81,10 @@ variable "resource_names_map" {
       name       = "kv"
       max_length = 24
     }
+    cluster_identity = {
+      name       = "msi"
+      max_length = 60
+    }
   }
 }
 
@@ -129,15 +133,47 @@ variable "private_cluster_public_fqdn_enabled" {
   description = "(Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to `false`."
 }
 
-variable "private_dns_zone_id" {
-  type        = string
-  default     = null
-  description = <<EOT
-    (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster or
-    `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving,
-    otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created.
-  EOT
+variable "additional_vnet_links" {
+  description = "A list of VNET IDs for which vnet links to be created with the private AKS cluster DNS Zone. Applicable only when private_cluster_enabled is true."
+  type        = map(string)
+  default     = {}
 }
+
+variable "cluster_identity_role_assignments" {
+  description = <<EOT
+    A map of role assignments to be associated with the cluster identity
+    Should be of the format
+    {
+      private-dns = ["Private DNS Zone Contributor", "<private-dns-zone-id>"]
+      dns = ["DNS Zone Contributor", "<dns-zone-id>"]
+    }
+  EOT
+  type        = map(list(string))
+  default     = {}
+}
+
+variable "node_pool_identity_role_assignments" {
+  description = <<EOT
+    A map of role assignments to be associated with the node-pool identity
+    Should be of the format
+    {
+      private-dns = ["Private DNS Zone Contributor", "<private-dns-zone-id>"]
+      dns = ["DNS Zone Contributor", "<dns-zone-id>"]
+    }
+  EOT
+  type        = map(list(string))
+  default     = {}
+}
+
+# variable "private_dns_zone_id" {
+#   type        = string
+#   default     = null
+#   description = <<EOT
+#     (Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster or
+#     `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving,
+#     otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created.
+#   EOT
+# }
 
 variable "vnet_subnet_id" {
   type        = string
@@ -801,17 +837,32 @@ variable "secret_rotation_interval" {
   nullable    = false
 }
 
+variable "create_key_vault" {
+  description = "Create a new Key Vault to be associated with the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "key_vault_role_definition" {
+  description = "Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator`"
+  type        = string
+  default     = "Key Vault Administrator"
+}
+
+variable "additional_key_vault_ids" {
+  description = <<EOT
+    IDs of the additional key vaults to be associated with the AKS cluster. The key vault MSI will be assigned
+    the role defined in `key_vault_role_definition` on these key vaults.
+  EOT
+  type        = list(string)
+  default     = []
+}
+
 variable "enable_rbac_authorization" {
   type        = bool
   default     = false
   description = "Enable Kubernetes Role-Based Access Control on the Key Vault"
   nullable    = false
-}
-
-variable "key_vault_role_definition" {
-  description = "Role definition for the Key Vault. Default is `Key Vault Administrator`"
-  type        = string
-  default     = "Key Vault Administrator"
 }
 
 variable "sku_tier" {
@@ -872,7 +923,7 @@ EOT
 
 variable "identity_ids" {
   type        = list(string)
-  default     = null
+  default     = []
   description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster."
 }
 
@@ -921,17 +972,6 @@ variable "container_registry_ids" {
   description = "List of container registry IDs to associate with AKS. This module will assign role `AcrPull` to AKS for these registries"
   type        = list(string)
   default     = []
-}
-
-variable "container_registry" {
-  description = "This will create a dedicated container registry for this AKS cluster"
-  type = object({
-    name                  = optional(string, "")
-    admin_enabled         = bool
-    sku                   = optional(string, "Basic")
-    retention_policy_days = optional(number, 0)
-  })
-  default = null
 }
 
 ## Key Vault related variables
