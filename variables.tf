@@ -85,6 +85,10 @@ variable "resource_names_map" {
       name       = "msi"
       max_length = 60
     }
+    route_table = {
+      name       = "rt"
+      max_length = 60
+    }
   }
 }
 
@@ -190,7 +194,21 @@ variable "net_profile_dns_service_ip" {
 variable "net_profile_outbound_type" {
   type        = string
   default     = "loadBalancer"
-  description = "(Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer."
+  description = <<EOT
+    (Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are
+    loadBalancer and userDefinedRouting. Defaults to loadBalancer.
+    if `userDefinedRouting` is selected, `user_defined_routing` variable is required.
+  EOT
+}
+
+variable "user_defined_routing" {
+  description = <<EOT
+    This variable is required only when net_profile_outbound_type is set to `userDefinedRouting`
+  EOT
+  type = object({
+    azure_firewall_private_ip_address = string
+  })
+  default = null
 }
 
 variable "net_profile_pod_cidr" {

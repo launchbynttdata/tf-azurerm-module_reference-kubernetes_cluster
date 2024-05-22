@@ -135,6 +135,55 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
+# Route table creation is required for user-defined routing
+module "route_table" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-route_table.git?ref=1.0.0"
+
+  count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
+
+  name                          = module.resource_names["route_table"].standard
+  location                      = var.region
+  disable_bgp_route_propagation = false
+  resource_group_name           = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  tags = merge(local.tags, {
+    resource_name = module.resource_names["route_table"].standard
+  })
+
+  depends_on = [module.resource_group]
+}
+
+# This is mandatory in case of `kubenet` network plugin
+module "udr_route_table_role_assignment" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+
+  count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
+  # cluster identity
+  principal_id         = module.cluster_identity[0].principal_id
+  role_definition_name = "Contributor"
+  scope                = module.route_table[0].id
+
+  depends_on = [module.cluster_identity, module.route_table]
+}
+
+module "routes" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-route.git?ref=1.0.0"
+
+  count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
+
+  routes = local.udr_routes
+
+  depends_on = [module.route_table]
+}
+
+module "subnet_route_table_assoc" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-routetable_subnet_association.git?ref=1.0.0"
+
+  for_each = var.net_profile_outbound_type == "userDefinedRouting" ? local.all_subnet_ids : []
+
+  subnet_id      = each.value
+  route_table_id = module.route_table[0].id
+}
+
 module "aks" {
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster.git?ref=1.0.0"
 
@@ -246,7 +295,7 @@ module "aks" {
     resource_name = module.resource_names["aks"].standard
   })
 
-  depends_on = [module.resource_group, module.private_cluster_dns_zone, module.cluster_identity]
+  depends_on = [module.resource_group, module.private_cluster_dns_zone, module.cluster_identity, module.subnet_route_table_assoc]
 }
 
 # Assign the cluster identity the required roles on RG and VNet

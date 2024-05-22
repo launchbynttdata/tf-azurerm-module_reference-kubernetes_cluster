@@ -151,12 +151,19 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
   ```
 - Run `kubectl get nodes` to see the nodes in the cluster
 
+# References
+1. [Mandatory outbound access](https://learn.microsoft.com/en-us/azure/aks/outbound-rules-control-egress)
+2. [Restrict Egress with Azure Firewall](https://learn.microsoft.com/en-us/azure/aks/limit-egress-traffic?tabs=aks-with-system-assigned-identities)
+3. [Kubenet with BYO subnet and route table](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet#bring-your-own-subnet-and-route-table-with-kubenet)
+4. [Required Service Tags for Outbound traffic](https://learn.microsoft.com/en-us/azure/aks/outbound-rules-control-egress#azure-global-required-network-rules)
+# Terraform Details
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, <= 1.5.5 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.67 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.5 |
 
