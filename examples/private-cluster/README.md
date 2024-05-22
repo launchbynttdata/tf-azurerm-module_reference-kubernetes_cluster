@@ -8,7 +8,9 @@ This example creates a private AKS cluster with a custom subnet passed in as inp
 - By default, even for private AKS clusters, the nodes have unrestricted outbound route to the internet. Azure achieves that through a public Load Balancer (`net_profile_outbound_type=LoadBalancer`) that routes traffic to the internet.
   Few scenarios where the outbound traffic route is required is to sync time on the Node pool, interact with Azure AD Server, access public container registries to pull images etc.
 - In case you want to restrict the outbound traffic, this can be done by setting `net_profile_outbound_type=UserDefinedRouting`.
-  In such case an Azure firewall must be used to control outbound traffic. Mandatory outbound traffic must be whitelisted on the Firewall. For example, to ensure linkerd is working, one needs to whitelist `cr.l5d.ioghcr.io, pkg-containers.githubusercontent.com, docker.l5d.io`
+  In such case an Azure firewall must be used to control outbound traffic. Mandatory outbound traffic must be whitelisted on the Firewall.
+  For example, to ensure linkerd is working, one needs to whitelist `cr.l5d.ioghcr.io, pkg-containers.githubusercontent.com, docker.l5d.io`
+- More information on UDR can be found at [UserDefinedRouting.md](UserDefinedRouting.md)
 
 ## What is a private cluster?
 
@@ -151,12 +153,19 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
   ```
 - Run `kubectl get nodes` to see the nodes in the cluster
 
+# References
+1. [Mandatory outbound access](https://learn.microsoft.com/en-us/azure/aks/outbound-rules-control-egress)
+2. [Restrict Egress with Azure Firewall](https://learn.microsoft.com/en-us/azure/aks/limit-egress-traffic?tabs=aks-with-system-assigned-identities)
+3. [Kubenet with BYO subnet and route table](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet#bring-your-own-subnet-and-route-table-with-kubenet)
+4. [Required Service Tags for Outbound traffic](https://learn.microsoft.com/en-us/azure/aks/outbound-rules-control-egress#azure-global-required-network-rules)
+# Terraform Details
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, <= 1.5.5 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.67 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.5 |
 
