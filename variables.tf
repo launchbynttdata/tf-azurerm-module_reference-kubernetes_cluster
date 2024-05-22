@@ -102,8 +102,11 @@ variable "resource_group_name" {
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.26"
-  description = "Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region"
+  default     = "1.28"
+  description = <<EOT
+    Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region
+    Use `az aks get-versions --location <region>` to find the available versions in the region
+  EOT
 }
 
 variable "network_plugin" {
@@ -204,6 +207,7 @@ variable "net_profile_outbound_type" {
 variable "user_defined_routing" {
   description = <<EOT
     This variable is required only when net_profile_outbound_type is set to `userDefinedRouting`
+    The private IP address of the Azure Firewall instance is needed to create route in custom Route table
   EOT
   type = object({
     azure_firewall_private_ip_address = string
@@ -1051,7 +1055,6 @@ variable "keys" {
   }))
   default = {}
 }
-
 
 variable "tags" {
   description = "A map of custom tags to be attached to this module resources"

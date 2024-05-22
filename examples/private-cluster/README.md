@@ -8,7 +8,9 @@ This example creates a private AKS cluster with a custom subnet passed in as inp
 - By default, even for private AKS clusters, the nodes have unrestricted outbound route to the internet. Azure achieves that through a public Load Balancer (`net_profile_outbound_type=LoadBalancer`) that routes traffic to the internet.
   Few scenarios where the outbound traffic route is required is to sync time on the Node pool, interact with Azure AD Server, access public container registries to pull images etc.
 - In case you want to restrict the outbound traffic, this can be done by setting `net_profile_outbound_type=UserDefinedRouting`.
-  In such case an Azure firewall must be used to control outbound traffic. Mandatory outbound traffic must be whitelisted on the Firewall. For example, to ensure linkerd is working, one needs to whitelist `cr.l5d.ioghcr.io, pkg-containers.githubusercontent.com, docker.l5d.io`
+  In such case an Azure firewall must be used to control outbound traffic. Mandatory outbound traffic must be whitelisted on the Firewall.
+  For example, to ensure linkerd is working, one needs to whitelist `cr.l5d.ioghcr.io, pkg-containers.githubusercontent.com, docker.l5d.io`
+- More information on UDR can be found at [UserDefinedRouting.md](UserDefinedRouting.md)
 
 ## What is a private cluster?
 

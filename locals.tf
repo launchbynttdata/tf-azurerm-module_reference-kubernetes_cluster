@@ -15,9 +15,11 @@ locals {
     provisioner = "Terraform"
   }
 
+  # Fetching the Vnet ID from input subnet ID
   vnet_id           = var.vnet_subnet_id != null ? join("/", slice(split("/", var.vnet_subnet_id), 0, 9)) : null
   resource_group_id = var.resource_group_name != null ? data.azurerm_resource_group.rg[0].id : module.resource_group[0].id
 
+  # The Cluster MSI needs a `Network Contributer` role assignment on the VNet for BYO VNet scenarios
   vnet_role_assignment = local.vnet_id != null ? {
     "vnet" = ["Network Contributor", local.vnet_id]
   } : {}
