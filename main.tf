@@ -143,7 +143,7 @@ module "route_table" {
 
   name                          = module.resource_names["route_table"].standard
   location                      = var.region
-  disable_bgp_route_propagation = false
+  disable_bgp_route_propagation = var.disable_bgp_route_propagation
   resource_group_name           = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   tags = merge(local.tags, {
     resource_name = module.resource_names["route_table"].standard

@@ -162,7 +162,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.97.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.106.1 |
 
 ## Modules
 
@@ -299,6 +299,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="input_certificates"></a> [certificates](#input\_certificates) | List of certificates to be imported. The pfx files should be present in the root of the module (path.root) and its name denoted as certificate\_name | <pre>map(object({<br>    certificate_name = string<br>    password         = string<br>  }))</pre> | `{}` | no |
 | <a name="input_secrets"></a> [secrets](#input\_secrets) | List of secrets (name and value) | `map(string)` | `{}` | no |
 | <a name="input_keys"></a> [keys](#input\_keys) | List of keys to be created in key vault. Name of the key is the key of the map | <pre>map(object({<br>    key_type = string<br>    key_size = number<br>    key_opts = list(string)<br>  }))</pre> | `{}` | no |
+| <a name="input_disable_bgp_route_propagation"></a> [disable\_bgp\_route\_propagation](#input\_disable\_bgp\_route\_propagation) | Disable BGP route propagation on the routing table that AKS manages. | `bool` | `false` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of custom tags to be attached to this module resources | `map(string)` | `{}` | no |
 
 ## Outputs
