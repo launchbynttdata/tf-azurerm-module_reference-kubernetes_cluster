@@ -1056,6 +1056,12 @@ variable "keys" {
   default = {}
 }
 
+variable "disable_bgp_route_propagation" {
+  description = "Disable BGP route propagation on the routing table that AKS manages."
+  default     = false
+  type        = bool
+}
+
 variable "tags" {
   description = "A map of custom tags to be attached to this module resources"
   type        = map(string)
