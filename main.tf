@@ -332,3 +332,28 @@ module "additional_acr_role_assignments" {
   role_definition_name = "AcrPull"
   scope                = each.key
 }
+
+module "application_insights" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-application_insights.git?ref=1.0.0"
+
+  count = var.create_application_insights ? 1 : 0
+
+  name                                  = module.resource_names["aks"].standard
+  resource_group_name                   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location                              = var.region
+  application_type                      = var.application_insights.application_type
+  retention_in_days                     = var.application_insights.retention_in_days
+  daily_data_cap_in_gb                  = var.application_insights.daily_data_cap_in_gb
+  daily_data_cap_notifications_disabled = var.application_insights.daily_data_cap_notifications_disabled
+  sampling_percentage                   = var.application_insights.sampling_percentage
+  disable_ip_masking                    = var.application_insights.disabling_ip_masking
+  workspace_id                          = module.aks.azurerm_log_analytics_workspace_id
+  local_authentication_disabled         = var.application_insights.local_authentication_disabled
+  internet_ingestion_enabled            = var.application_insights.internet_ingestion_enabled
+  internet_query_enabled                = var.application_insights.internet_query_enabled
+  force_customer_storage_for_profiler   = var.application_insights.force_customer_storage_for_profiler
+
+  tags = merge(local.tags, {
+    resource_name = module.resource_names["application_insights"].standard
+  })
+}

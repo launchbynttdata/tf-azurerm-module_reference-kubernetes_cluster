@@ -89,6 +89,10 @@ variable "resource_names_map" {
       name       = "rt"
       max_length = 60
     }
+    application_insights = {
+      name       = "appins"
+      max_length = 60
+    }
   }
 }
 
@@ -1060,6 +1064,32 @@ variable "disable_bgp_route_propagation" {
   description = "Disable BGP route propagation on the routing table that AKS manages."
   default     = false
   type        = bool
+}
+
+## Application Insights
+
+variable "create_application_insights" {
+  description = "Ff true, create a new Application Insights resource to be associated with the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "application_insights" {
+  description = "Details for the Application Insights resource to be associated with the AKS cluster. Required only when create_application_insights=true"
+  type = object({
+    application_type                      = optional(string, "web")
+    retention_in_days                     = optional(number, 30)
+    daily_data_cap_in_gb                  = optional(number, 1)
+    daily_data_cap_notifications_disabled = optional(bool, false)
+    sampling_percentage                   = optional(number, 100)
+    disabling_ip_masking                  = optional(bool, false)
+    local_authentication_disabled         = optional(bool, false)
+    internet_ingestion_enabled            = optional(bool, false)
+    internet_query_enabled                = optional(bool, true)
+    force_customer_storage_for_profiler   = optional(bool, false)
+  })
+
+  default = {}
 }
 
 variable "tags" {

@@ -162,7 +162,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.106.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.97.1 |
 
 ## Modules
 
@@ -184,6 +184,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="module_cluster_identity_roles"></a> [cluster\_identity\_roles](#module\_cluster\_identity\_roles) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
 | <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
 | <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-application_insights.git | 1.0.0 |
 
 ## Resources
 
@@ -201,7 +202,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="input_environment_number"></a> [environment\_number](#input\_environment\_number) | The environment count for the respective environment. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_resource_number"></a> [resource\_number](#input\_resource\_number) | The resource count for the respective resource. Defaults to 000. Increments in value of 1 | `string` | `"000"` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region in which the infra needs to be provisioned | `string` | `"eastus"` | no |
-| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "acr": {<br>    "max_length": 60,<br>    "name": "acr"<br>  },<br>  "aks": {<br>    "max_length": 60,<br>    "name": "aks"<br>  },<br>  "application_gateway": {<br>    "max_length": 60,<br>    "name": "appgtw"<br>  },<br>  "cluster_identity": {<br>    "max_length": 60,<br>    "name": "msi"<br>  },<br>  "key_vault": {<br>    "max_length": 24,<br>    "name": "kv"<br>  },<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  },<br>  "route_table": {<br>    "max_length": 60,<br>    "name": "rt"<br>  }<br>}</pre> | no |
+| <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of key to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object(<br>    {<br>      name       = string<br>      max_length = optional(number, 60)<br>    }<br>  ))</pre> | <pre>{<br>  "acr": {<br>    "max_length": 60,<br>    "name": "acr"<br>  },<br>  "aks": {<br>    "max_length": 60,<br>    "name": "aks"<br>  },<br>  "application_gateway": {<br>    "max_length": 60,<br>    "name": "appgtw"<br>  },<br>  "application_insights": {<br>    "max_length": 60,<br>    "name": "appins"<br>  },<br>  "cluster_identity": {<br>    "max_length": 60,<br>    "name": "msi"<br>  },<br>  "key_vault": {<br>    "max_length": 24,<br>    "name": "kv"<br>  },<br>  "resource_group": {<br>    "max_length": 60,<br>    "name": "rg"<br>  },<br>  "route_table": {<br>    "max_length": 60,<br>    "name": "rt"<br>  }<br>}</pre> | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group in which the AKS cluster will be created. If not provided, this module will create one | `string` | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region<br>    Use `az aks get-versions --location <region>` to find the available versions in the region | `string` | `"1.28"` | no |
 | <a name="input_network_plugin"></a> [network\_plugin](#input\_network\_plugin) | Network plugin to use for networking. Default is azure. | `string` | `"azure"` | no |
@@ -300,6 +301,8 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="input_secrets"></a> [secrets](#input\_secrets) | List of secrets (name and value) | `map(string)` | `{}` | no |
 | <a name="input_keys"></a> [keys](#input\_keys) | List of keys to be created in key vault. Name of the key is the key of the map | <pre>map(object({<br>    key_type = string<br>    key_size = number<br>    key_opts = list(string)<br>  }))</pre> | `{}` | no |
 | <a name="input_disable_bgp_route_propagation"></a> [disable\_bgp\_route\_propagation](#input\_disable\_bgp\_route\_propagation) | Disable BGP route propagation on the routing table that AKS manages. | `bool` | `false` | no |
+| <a name="input_create_application_insights"></a> [create\_application\_insights](#input\_create\_application\_insights) | Ff true, create a new Application Insights resource to be associated with the AKS cluster | `bool` | `false` | no |
+| <a name="input_application_insights"></a> [application\_insights](#input\_application\_insights) | Details for the Application Insights resource to be associated with the AKS cluster. Required only when create\_application\_insights=true | <pre>object({<br>    application_type                      = optional(string, "web")<br>    retention_in_days                     = optional(number, 30)<br>    daily_data_cap_in_gb                  = optional(number, 1)<br>    daily_data_cap_notifications_disabled = optional(bool, false)<br>    sampling_percentage                   = optional(number, 100)<br>    disabling_ip_masking                  = optional(bool, false)<br>    local_authentication_disabled         = optional(bool, false)<br>    internet_ingestion_enabled            = optional(bool, false)<br>    internet_query_enabled                = optional(bool, true)<br>    force_customer_storage_for_profiler   = optional(bool, false)<br>  })</pre> | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of custom tags to be attached to this module resources | `map(string)` | `{}` | no |
 
 ## Outputs
