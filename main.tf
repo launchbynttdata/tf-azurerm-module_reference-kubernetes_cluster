@@ -338,7 +338,7 @@ module "application_insights" {
 
   count = var.create_application_insights ? 1 : 0
 
-  name                                  = module.resource_names["aks"].standard
+  name                                  = module.resource_names["application_insights"].standard
   resource_group_name                   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                              = var.region
   application_type                      = var.application_insights.application_type
@@ -356,4 +356,66 @@ module "application_insights" {
   tags = merge(local.tags, {
     resource_name = module.resource_names["application_insights"].standard
   })
+}
+
+module "monitor_private_link_scope" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-azure_monitor_private_link_scope.git?ref=feature!/initial-implementation"
+
+  count = var.create_monitor_private_link_scope ? 1 : 0
+
+  name                                  = module.resource_names["monitor_private_link_scope"].standard
+  resource_group_name                   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  tags = merge(local.tags, {
+    resource_name = module.resource_names["monitor_private_link_scope"].standard
+  })
+
+  linked_resource_ids = [
+    module.aks.azurerm_log_analytics_workspace_id,
+    module.application_insights[0].application_insights_id
+  ]
+}
+
+module "monitor_private_link_scope_dns_zone" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git?ref=1.0.0"
+
+  for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
+
+  zone_name           = each.key
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  tags = local.tags
+}
+
+module "vnet_link" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git?ref=1.0.0"
+
+  for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
+
+  link_name             = replace(each.key, ".", "-")
+  resource_group_name   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_dns_zone_name = module.monitor_private_link_scope_dns_zone[each.key].zone_name
+  virtual_network_id    = join("/", slice(split("/", var.vnet_subnet_id), 0, 9))
+  registration_enabled  = false
+
+  tags = local.tags
+}
+
+module "private_endpoint" {
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_endpoint.git?ref=1.0.0"
+
+  count = var.create_monitor_private_link_scope ? 1 : 0
+
+  region                          = var.location
+  endpoint_name                   = module.resource_names["monitor_private_link_scope_endpoint"].standard
+  is_manual_connection            = false
+  resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_service_connection_name = module.resource_names["monitor_private_link_scope_service_connection"].standard
+  private_connection_resource_id  = module.monitor_private_link_scope.private_link_scope_id
+  subresource_names               = ["azuremonitor"]
+  subnet_id                       = var.monitor_private_link_scope_subnet_id
+  private_dns_zone_ids            = [for zone in module.monitor_private_link_scope_dns_zone : zone.id]
+  private_dns_zone_group_name     = "azuremonitor"
+
+  tags = merge(var.tags, { resource_name = module.resource_names["monitor_private_link_scope_endpoint"].standard })
 }
