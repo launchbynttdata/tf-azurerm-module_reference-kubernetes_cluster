@@ -363,17 +363,17 @@ module "monitor_private_link_scope" {
 
   count = var.create_monitor_private_link_scope ? 1 : 0
 
-  name                                  = module.resource_names["monitor_private_link_scope"].standard
-  resource_group_name                   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  name                = module.resource_names["monitor_private_link_scope"].standard
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
 
   tags = merge(local.tags, {
     resource_name = module.resource_names["monitor_private_link_scope"].standard
   })
 
-  linked_resource_ids = [
-    module.aks.azurerm_log_analytics_workspace_id,
-    module.application_insights[0].application_insights_id
-  ]
+  linked_resource_ids = {
+    aks_monitor_workspace = module.aks.azurerm_log_analytics_workspace_id
+    application_insights  = module.application_insights[0].id
+  }
 }
 
 module "monitor_private_link_scope_dns_zone" {
@@ -406,12 +406,12 @@ module "private_endpoint" {
 
   count = var.create_monitor_private_link_scope ? 1 : 0
 
-  region                          = var.location
+  region                          = var.region
   endpoint_name                   = module.resource_names["monitor_private_link_scope_endpoint"].standard
   is_manual_connection            = false
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   private_service_connection_name = module.resource_names["monitor_private_link_scope_service_connection"].standard
-  private_connection_resource_id  = module.monitor_private_link_scope.private_link_scope_id
+  private_connection_resource_id  = module.monitor_private_link_scope[0].private_link_scope_id
   subresource_names               = ["azuremonitor"]
   subnet_id                       = var.monitor_private_link_scope_subnet_id
   private_dns_zone_ids            = [for zone in module.monitor_private_link_scope_dns_zone : zone.id]

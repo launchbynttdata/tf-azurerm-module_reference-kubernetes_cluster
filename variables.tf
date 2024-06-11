@@ -1107,24 +1107,24 @@ variable "application_insights" {
 ## Private Link Scope
 
 variable "create_monitor_private_link_scope" {
-  description =<<EOF
+  description = <<EOF
     If true, create a new Private Link Scope for Azure Monitor.
     NOTE: This will cause all azure monitor / log analytics traffic to go through private link.
   EOF
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "monitor_private_link_scope_subnet_id" {
   description = "The ID of the subnet to associate with the Azure Monitor private link scope"
-  type = string
-  default = null
+  type        = string
+  default     = null
 }
 
 # https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#management-and-governance
 variable "monitor_private_link_scope_dns_zone_suffixes" {
   description = "The DNS zone suffixes for the private link scope"
-  type = set(string)
+  type        = set(string)
   default = [
     "privatelink.monitor.azure.com",
     "privatelink.oms.opinsights.azure.com",
