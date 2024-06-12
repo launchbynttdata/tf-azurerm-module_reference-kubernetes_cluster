@@ -91,7 +91,7 @@ variable "subnet_prefixes" {
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.26.3"
+  default     = "1.27"
   description = "Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region"
 }
 

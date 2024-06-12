@@ -387,7 +387,7 @@ module "monitor_private_link_scope_dns_zone" {
   tags = local.tags
 }
 
-module "vnet_link" {
+module "monitor_private_link_scope_vnet_link" {
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git?ref=1.0.0"
 
   for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
@@ -401,7 +401,7 @@ module "vnet_link" {
   tags = local.tags
 }
 
-module "private_endpoint" {
+module "monitor_private_link_scope_private_endpoint" {
   source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_endpoint.git?ref=1.0.0"
 
   count = var.create_monitor_private_link_scope ? 1 : 0

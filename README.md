@@ -187,8 +187,8 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-application_insights.git | 1.0.0 |
 | <a name="module_monitor_private_link_scope"></a> [monitor\_private\_link\_scope](#module\_monitor\_private\_link\_scope) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-azure_monitor_private_link_scope.git | feature!/initial-implementation |
 | <a name="module_monitor_private_link_scope_dns_zone"></a> [monitor\_private\_link\_scope\_dns\_zone](#module\_monitor\_private\_link\_scope\_dns\_zone) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git | 1.0.0 |
-| <a name="module_vnet_link"></a> [vnet\_link](#module\_vnet\_link) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git | 1.0.0 |
-| <a name="module_private_endpoint"></a> [private\_endpoint](#module\_private\_endpoint) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_endpoint.git | 1.0.0 |
+| <a name="module_monitor_private_link_scope_vnet_link"></a> [monitor\_private\_link\_scope\_vnet\_link](#module\_monitor\_private\_link\_scope\_vnet\_link) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git | 1.0.0 |
+| <a name="module_monitor_private_link_scope_private_endpoint"></a> [monitor\_private\_link\_scope\_private\_endpoint](#module\_monitor\_private\_link\_scope\_private\_endpoint) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_endpoint.git | 1.0.0 |
 
 ## Resources
 
