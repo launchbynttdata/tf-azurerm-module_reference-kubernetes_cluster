@@ -162,28 +162,28 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.106.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.110.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git | 1.0.1 |
-| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git | 1.0.0 |
-| <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-key_vault.git | 1.0.0 |
-| <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
-| <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
-| <a name="module_cluster_identity"></a> [cluster\_identity](#module\_cluster\_identity) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git | 1.0.0 |
-| <a name="module_private_cluster_dns_zone"></a> [private\_cluster\_dns\_zone](#module\_private\_cluster\_dns\_zone) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git | 1.0.0 |
-| <a name="module_vnet_links"></a> [vnet\_links](#module\_vnet\_links) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git | 1.0.0 |
-| <a name="module_route_table"></a> [route\_table](#module\_route\_table) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-route_table.git | 1.0.0 |
-| <a name="module_udr_route_table_role_assignment"></a> [udr\_route\_table\_role\_assignment](#module\_udr\_route\_table\_role\_assignment) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
-| <a name="module_routes"></a> [routes](#module\_routes) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-route.git | 1.0.0 |
-| <a name="module_subnet_route_table_assoc"></a> [subnet\_route\_table\_assoc](#module\_subnet\_route\_table\_assoc) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-routetable_subnet_association.git | 1.0.0 |
-| <a name="module_aks"></a> [aks](#module\_aks) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster.git | 1.0.0 |
-| <a name="module_cluster_identity_roles"></a> [cluster\_identity\_roles](#module\_cluster\_identity\_roles) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
-| <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
-| <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git | 1.0.0 |
+| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 1.0 |
+| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.0 |
+| <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | terraform.registry.launch.nttdata.com/module_primitive/key_vault/azurerm | ~> 1.0 |
+| <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_cluster_identity"></a> [cluster\_identity](#module\_cluster\_identity) | terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm | ~> 1.0 |
+| <a name="module_private_cluster_dns_zone"></a> [private\_cluster\_dns\_zone](#module\_private\_cluster\_dns\_zone) | terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm | ~> 1.0 |
+| <a name="module_vnet_links"></a> [vnet\_links](#module\_vnet\_links) | terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm | ~> 1.0 |
+| <a name="module_route_table"></a> [route\_table](#module\_route\_table) | terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm | ~> 1.0 |
+| <a name="module_udr_route_table_role_assignment"></a> [udr\_route\_table\_role\_assignment](#module\_udr\_route\_table\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_routes"></a> [routes](#module\_routes) | terraform.registry.launch.nttdata.com/module_primitive/route/azurerm | ~> 1.0 |
+| <a name="module_subnet_route_table_assoc"></a> [subnet\_route\_table\_assoc](#module\_subnet\_route\_table\_assoc) | terraform.registry.launch.nttdata.com/module_primitive/routetable_subnet_association/azurerm | ~> 1.0 |
+| <a name="module_aks"></a> [aks](#module\_aks) | terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm | ~> 1.0 |
+| <a name="module_cluster_identity_roles"></a> [cluster\_identity\_roles](#module\_cluster\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 
 ## Resources
 
