@@ -11,7 +11,8 @@
 // limitations under the License.
 
 module "resource_names" {
-  source = "git::https://github.com/launchbynttdata/tf-launch-module_library-resource_name.git?ref=1.0.1"
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
+  version = "~> 1.0"
 
   for_each = var.resource_names_map
 
@@ -28,7 +29,8 @@ module "resource_names" {
 }
 
 module "resource_group" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-resource_group.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
+  version = "~> 1.0"
 
   count = var.resource_group_name != null ? 0 : 1
 
@@ -39,7 +41,8 @@ module "resource_group" {
 }
 
 module "key_vault" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-key_vault.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/key_vault/azurerm"
+  version = "~> 1.0"
 
   count = var.create_key_vault ? 1 : 0
 
@@ -63,7 +66,8 @@ module "key_vault" {
 
 # Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
 module "key_vault_role_assignment" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
 
   count = var.create_key_vault ? 1 : 0
 
@@ -76,7 +80,8 @@ module "key_vault_role_assignment" {
 
 # The Key Vault MSI must be assigned Role to access the Key Vault from which AKS will retrieve the secrets.
 module "additional_key_vaults_role_assignment" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
 
   for_each = toset(var.additional_key_vault_ids)
 
@@ -89,7 +94,8 @@ module "additional_key_vaults_role_assignment" {
 
 # Create a user-assigned managed identity for the AKS cluster
 module "cluster_identity" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-user_managed_identity.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm"
+  version = "~> 1.0"
 
   count = var.identity_type == "UserAssigned" ? 1 : 0
 
@@ -101,7 +107,8 @@ module "cluster_identity" {
 }
 
 module "private_cluster_dns_zone" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
+  version = "~> 1.0"
 
   count = var.private_cluster_enabled ? 1 : 0
 
@@ -114,7 +121,8 @@ module "private_cluster_dns_zone" {
 }
 
 module "vnet_links" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
+  version = "~> 1.0"
 
   for_each = var.private_cluster_enabled && length(var.additional_vnet_links) > 0 ? var.additional_vnet_links : {}
 
@@ -137,7 +145,8 @@ data "azurerm_resource_group" "rg" {
 
 # Route table creation is required for user-defined routing
 module "route_table" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-route_table.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm"
+  version = "~> 1.0"
 
   count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
 
@@ -154,7 +163,8 @@ module "route_table" {
 
 # This is mandatory in case of `kubenet` network plugin
 module "udr_route_table_role_assignment" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
 
   count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
   # cluster identity
@@ -166,7 +176,8 @@ module "udr_route_table_role_assignment" {
 }
 
 module "routes" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-route.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/route/azurerm"
+  version = "~> 1.0"
 
   count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
 
@@ -176,7 +187,8 @@ module "routes" {
 }
 
 module "subnet_route_table_assoc" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-routetable_subnet_association.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/routetable_subnet_association/azurerm"
+  version = "~> 1.0"
 
   for_each = var.net_profile_outbound_type == "userDefinedRouting" ? local.all_subnet_ids : []
 
@@ -185,7 +197,8 @@ module "subnet_route_table_assoc" {
 }
 
 module "aks" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-kubernetes_cluster.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm"
+  version = "~> 1.0"
 
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                        = var.region
@@ -300,7 +313,8 @@ module "aks" {
 
 # Assign the cluster identity the required roles on RG and VNet
 module "cluster_identity_roles" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
 
   for_each = local.cluster_identity_role_assignments
 
@@ -312,7 +326,8 @@ module "cluster_identity_roles" {
 }
 
 module "node_pool_identity_roles" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
 
   for_each = var.node_pool_identity_role_assignments
 
@@ -324,7 +339,8 @@ module "node_pool_identity_roles" {
 }
 
 module "additional_acr_role_assignments" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-role_assignment.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
 
   for_each = toset(var.container_registry_ids)
 
@@ -334,7 +350,8 @@ module "additional_acr_role_assignments" {
 }
 
 module "application_insights" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-application_insights.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/application_insights/azurerm"
+  version = "~> 1.0"
 
   count = var.create_application_insights ? 1 : 0
 
@@ -359,7 +376,8 @@ module "application_insights" {
 }
 
 module "monitor_private_link_scope" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-azure_monitor_private_link_scope.git?ref=feature!/initial-implementation"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/azure_monitor_private_link_scope/azurerm"
+  version = "~> 1.0"
 
   count = var.create_monitor_private_link_scope ? 1 : 0
 
@@ -377,7 +395,8 @@ module "monitor_private_link_scope" {
 }
 
 module "monitor_private_link_scope_dns_zone" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_zone.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
+  version = "~> 1.0"
 
   for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
 
@@ -388,7 +407,8 @@ module "monitor_private_link_scope_dns_zone" {
 }
 
 module "monitor_private_link_scope_vnet_link" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_dns_vnet_link.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
+  version = "~> 1.0"
 
   for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
 
@@ -402,7 +422,8 @@ module "monitor_private_link_scope_vnet_link" {
 }
 
 module "monitor_private_link_scope_private_endpoint" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-private_endpoint.git?ref=1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
+  version = "~> 1.0"
 
   count = var.create_monitor_private_link_scope ? 1 : 0
 
