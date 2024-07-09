@@ -348,3 +348,95 @@ module "additional_acr_role_assignments" {
   role_definition_name = "AcrPull"
   scope                = each.key
 }
+
+module "application_insights" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/application_insights/azurerm"
+  version = "~> 1.0"
+
+  count = var.create_application_insights ? 1 : 0
+
+  name                                  = module.resource_names["application_insights"].standard
+  resource_group_name                   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location                              = var.region
+  application_type                      = var.application_insights.application_type
+  retention_in_days                     = var.application_insights.retention_in_days
+  daily_data_cap_in_gb                  = var.application_insights.daily_data_cap_in_gb
+  daily_data_cap_notifications_disabled = var.application_insights.daily_data_cap_notifications_disabled
+  sampling_percentage                   = var.application_insights.sampling_percentage
+  disable_ip_masking                    = var.application_insights.disabling_ip_masking
+  workspace_id                          = module.aks.azurerm_log_analytics_workspace_id
+  local_authentication_disabled         = var.application_insights.local_authentication_disabled
+  internet_ingestion_enabled            = var.application_insights.internet_ingestion_enabled
+  internet_query_enabled                = var.application_insights.internet_query_enabled
+  force_customer_storage_for_profiler   = var.application_insights.force_customer_storage_for_profiler
+
+  tags = merge(local.tags, {
+    resource_name = module.resource_names["application_insights"].standard
+  })
+}
+
+module "monitor_private_link_scope" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/azure_monitor_private_link_scope/azurerm"
+  version = "~> 1.0"
+
+  count = var.create_monitor_private_link_scope ? 1 : 0
+
+  name                = module.resource_names["monitor_private_link_scope"].standard
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  tags = merge(local.tags, {
+    resource_name = module.resource_names["monitor_private_link_scope"].standard
+  })
+
+  linked_resource_ids = {
+    aks_monitor_workspace = module.aks.azurerm_log_analytics_workspace_id
+    application_insights  = module.application_insights[0].id
+  }
+}
+
+module "monitor_private_link_scope_dns_zone" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
+
+  zone_name           = each.key
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  tags = local.tags
+}
+
+module "monitor_private_link_scope_vnet_link" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.create_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
+
+  link_name             = replace(each.key, ".", "-")
+  resource_group_name   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_dns_zone_name = module.monitor_private_link_scope_dns_zone[each.key].zone_name
+  virtual_network_id    = join("/", slice(split("/", var.vnet_subnet_id), 0, 9))
+  registration_enabled  = false
+
+  tags = local.tags
+}
+
+module "monitor_private_link_scope_private_endpoint" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
+  version = "~> 1.0"
+
+  count = var.create_monitor_private_link_scope ? 1 : 0
+
+  region                          = var.region
+  endpoint_name                   = module.resource_names["monitor_private_link_scope_endpoint"].standard
+  is_manual_connection            = false
+  resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_service_connection_name = module.resource_names["monitor_private_link_scope_service_connection"].standard
+  private_connection_resource_id  = module.monitor_private_link_scope[0].private_link_scope_id
+  subresource_names               = ["azuremonitor"]
+  subnet_id                       = var.monitor_private_link_scope_subnet_id
+  private_dns_zone_ids            = [for zone in module.monitor_private_link_scope_dns_zone : zone.id]
+  private_dns_zone_group_name     = "azuremonitor"
+
+  tags = merge(var.tags, { resource_name = module.resource_names["monitor_private_link_scope_endpoint"].standard })
+}
