@@ -312,6 +312,12 @@ module "aks" {
 }
 
 # Assign the cluster identity the required roles on RG and VNet
+#
+# TODO: fix role assignments so that it works with the `private-cluster` and `private-complete` examples
+#   - `local.cluster_identity_role_assignments` only has a 'vnet' key if the `vnet_subnet_id` is not null
+#   - in the 'private-cluster` example, `vnet_subnet_id` is set to the output of the `vnet` module, which is not known until during the apply
+#   - therefore this for_each fails, since this module doesn't know whether `vnet_subnet_id` is null before the apply
+
 module "cluster_identity_roles" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
@@ -487,6 +493,8 @@ module "monitor_private_link_scope" {
     } : {}, length(module.prometheus_monitor_data_collection) > 0 ? {
     prometheus_data_collection = module.prometheus_monitor_data_collection[0].data_collection_endpoint_id
   } : {})
+
+  depends_on = [module.resource_group, module.aks, module.application_insights, module.prometheus_monitor_workspace, module.prometheus_monitor_data_collection]
 }
 
 module "monitor_private_link_scope_dns_zone" {
@@ -499,6 +507,8 @@ module "monitor_private_link_scope_dns_zone" {
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
 
   tags = local.tags
+
+  depends_on = [module.resource_group]
 }
 
 module "monitor_private_link_scope_vnet_link" {
@@ -514,6 +524,8 @@ module "monitor_private_link_scope_vnet_link" {
   registration_enabled  = false
 
   tags = local.tags
+
+  depends_on = [module.resource_group, module.monitor_private_link_scope_dns_zone]
 }
 
 module "monitor_private_link_scope_private_endpoint" {
@@ -534,4 +546,6 @@ module "monitor_private_link_scope_private_endpoint" {
   private_dns_zone_group_name     = "azuremonitor"
 
   tags = merge(var.tags, { resource_name = module.resource_names["monitor_private_link_scope_endpoint"].standard })
+
+  depends_on = [module.resource_group, module.monitor_private_link_scope, module.monitor_private_link_scope_dns_zone]
 }
