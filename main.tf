@@ -399,6 +399,11 @@ module "prometheus_monitor_data_collection" {
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location            = var.region
 
+  enable_default_rule_groups  = var.prometheus_enable_default_rule_groups
+  default_rule_group_naming   = var.prometheus_default_rule_group_naming
+  default_rule_group_interval = var.prometheus_default_rule_group_interval
+  rule_groups                 = var.prometheus_rule_groups
+
   monitor_workspace_id = module.prometheus_monitor_workspace[0].id
 
   aks_cluster_id = module.aks.aks_id

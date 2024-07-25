@@ -145,9 +145,13 @@ module "aks" {
   monitor_private_link_scope_subnet_id         = module.vnet.vnet_subnets_name_id["subnet-private-endpoint"]
 
   enable_prometheus_monitoring                     = var.enable_prometheus_monitoring
+  prometheus_enable_default_rule_groups            = var.prometheus_enable_default_rule_groups
+  prometheus_default_rule_group_naming             = var.prometheus_default_rule_group_naming
+  prometheus_default_rule_group_interval           = var.prometheus_default_rule_group_interval
   prometheus_workspace_public_access_enabled       = var.prometheus_workspace_public_access_enabled
   prometheus_monitoring_private_endpoint_subnet_id = module.vnet.vnet_subnets_name_id["subnet-private-endpoint"]
 
+  prometheus_rule_groups = var.prometheus_rule_groups
 
   tags = var.tags
 

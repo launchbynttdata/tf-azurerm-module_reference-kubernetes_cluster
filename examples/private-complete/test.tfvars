@@ -15,3 +15,28 @@ private_cluster_enabled = true
 
 # User Assigned Managed Identity will be automatically created
 identity_type = "UserAssigned"
+
+prometheus_rule_groups = {
+  "MultiplePodAlertingRuleGroup" = {
+    enabled     = true
+    description = "Cluster contains more than one pod"
+    interval    = "PT1M"
+
+    recording_rules = []
+
+    # these will appear in the 'Alerts' blade of the Azure Monitor workspace or resource group when fired
+    alert_rules = [
+      {
+        name       = "pod_count_gt_1"
+        enabled    = true
+        expression = "count(kube_pod_info) > 1"
+        for        = "PT1M"
+        severity   = 3
+
+        labels = {
+          severity = "info"
+        }
+      }
+    ]
+  }
+}
