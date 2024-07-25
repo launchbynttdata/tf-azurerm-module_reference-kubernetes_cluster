@@ -227,7 +227,7 @@ output "application_insights_id" {
 
 output "monitor_private_link_scope_id" {
   description = "Resource ID of the monitor private link scope"
-  value       = length(module.monitor_private_link_scope) > 0 ? module.monitor_private_link_scope[0].id : null
+  value       = length(module.monitor_private_link_scope) > 0 ? module.monitor_private_link_scope[0].private_link_scope_id : null
 }
 
 output "monitor_private_link_scope_dns_zone_ids" {
