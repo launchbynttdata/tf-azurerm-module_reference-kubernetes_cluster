@@ -39,6 +39,9 @@ func TestKubernetesModule(t *testing.T) {
 			"private-cluster": {
 				"IS_TERRAFORM_IDEMPOTENT_APPLY": false,
 			},
+			"private-complete": {
+				"IS_TERRAFORM_IDEMPOTENT_APPLY": false,
+			},
 		}).
 		Build()
 

@@ -219,3 +219,48 @@ output "additional_vnet_links" {
   description = "The additional VNet links on the DNS zone of private AKS cluster."
   value       = { for name, id in var.additional_vnet_links : name => module.vnet_links[name].id }
 }
+
+output "application_insights_id" {
+  description = "Resource ID of the app insights instance"
+  value       = length(module.application_insights) > 0 ? module.application_insights[0].id : null
+}
+
+output "monitor_private_link_scope_id" {
+  description = "Resource ID of the monitor private link scope"
+  value       = length(module.monitor_private_link_scope) > 0 ? module.monitor_private_link_scope[0].id : null
+}
+
+output "monitor_private_link_scope_dns_zone_ids" {
+  description = "Map of Resource IDs of the monitor private link scope DNS zones"
+  value       = { for key, zone in module.monitor_private_link_scope_dns_zone : key => zone.id }
+}
+
+output "monitor_private_link_scope_private_endpoint_id" {
+  description = "Resource ID of the monitor private link scope private endpoint"
+  value       = length(module.monitor_private_link_scope_private_endpoint) > 0 ? module.monitor_private_link_scope_private_endpoint[0].id : null
+}
+
+output "prometheus_workspace_id" {
+  description = "Resource ID of the Prometheus Monitor workspace"
+  value       = length(module.prometheus_monitor_workspace) > 0 ? module.prometheus_monitor_workspace[0].id : null
+}
+
+output "prometheus_workspace_dns_zone_id" {
+  description = "Resource ID of the Prometheus Monitor workspace DNS zone"
+  value       = length(module.prometheus_monitor_workspace_private_dns_zone) > 0 ? module.prometheus_monitor_workspace_private_dns_zone[0].id : null
+}
+
+output "prometheus_workspace_private_endpoint_id" {
+  description = "Resource ID of the Prometheus Monitor workspace private endpoint"
+  value       = length(module.prometheus_monitor_workspace_private_endpoint) > 0 ? module.prometheus_monitor_workspace_private_endpoint[0].id : null
+}
+
+output "prometheus_data_collection_endpoint_id" {
+  description = "Resource ID of the Prometheus Monitor data collection endpoint"
+  value       = length(module.prometheus_monitor_data_collection) > 0 ? module.prometheus_monitor_data_collection[0].data_collection_endpoint_id : null
+}
+
+output "prometheus_data_collection_rule_id" {
+  description = "Resource ID of the Prometheus Monitor data collection rule"
+  value       = length(module.prometheus_monitor_data_collection) > 0 ? module.prometheus_monitor_data_collection[0].data_collection_rule_id : null
+}
