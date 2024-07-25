@@ -1,5 +1,5 @@
 product_family  = "dso"
-product_service = "pvt"
+product_service = "akspvt"
 
 kubernetes_version        = "1.28"
 agents_count              = 2

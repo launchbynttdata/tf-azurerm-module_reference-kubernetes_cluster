@@ -97,6 +97,8 @@ module "aks" {
   agents_pool_name          = var.agents_pool_name
   os_disk_size_gb           = var.os_disk_size_gb
 
+  monitor_metrics = var.monitor_metrics
+
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   secret_rotation_enabled            = var.secret_rotation_enabled
   secret_rotation_interval           = var.secret_rotation_interval
@@ -141,6 +143,11 @@ module "aks" {
 
   monitor_private_link_scope_dns_zone_suffixes = var.monitor_private_link_scope_dns_zone_suffixes
   monitor_private_link_scope_subnet_id         = module.vnet.vnet_subnets_name_id["subnet-private-endpoint"]
+
+  enable_prometheus_monitoring                     = var.enable_prometheus_monitoring
+  prometheus_workspace_public_access_enabled       = var.prometheus_workspace_public_access_enabled
+  prometheus_monitoring_private_endpoint_subnet_id = module.vnet.vnet_subnets_name_id["subnet-private-endpoint"]
+
 
   tags = var.tags
 

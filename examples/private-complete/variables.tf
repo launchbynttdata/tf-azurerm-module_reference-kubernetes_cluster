@@ -102,6 +102,21 @@ variable "network_plugin" {
   nullable    = false
 }
 
+variable "monitor_metrics" {
+  type = object({
+    annotations_allowed = optional(string)
+    labels_allowed      = optional(string)
+  })
+  default     = {}
+  description = <<-EOT
+  (Optional) Specifies a Prometheus add-on profile for the Kubernetes Cluster
+  object({
+    annotations_allowed = "(Optional) Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric."
+    labels_allowed      = "(Optional) Specifies a Comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric."
+  })
+EOT
+}
+
 variable "agents_count" {
   type        = number
   default     = 2
@@ -244,6 +259,19 @@ variable "monitor_private_link_scope_dns_zone_suffixes" {
     "privatelink.agentsvc.azure-automation.net",
     "privatelink.blob.core.windows.net"
   ]
+}
+
+## Prometheus
+variable "enable_prometheus_monitoring" {
+  description = "Deploy Prometheus monitoring resources with the AKS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "prometheus_workspace_public_access_enabled" {
+  description = "Enable public access to the Azure Monitor workspace for prometheus"
+  type        = bool
+  default     = true
 }
 
 variable "tags" {

@@ -105,6 +105,26 @@ variable "resource_names_map" {
       name       = "amplspesc"
       max_length = 60
     }
+    prometheus_monitor_workspace = {
+      name       = "promamw"
+      max_length = 60
+    }
+    prometheus_endpoint = {
+      name       = "prompe"
+      max_length = 60
+    }
+    prometheus_service_connection = {
+      name       = "prompesc"
+      max_length = 60
+    }
+    prometheus_data_collection_endpoint = {
+      name       = "promdce"
+      max_length = 60
+    }
+    prometheus_data_collection_rule = {
+      name       = "promdcr"
+      max_length = 60
+    }
   }
 }
 
@@ -1132,6 +1152,25 @@ variable "monitor_private_link_scope_dns_zone_suffixes" {
     "privatelink.agentsvc.azure-automation.net",
     "privatelink.blob.core.windows.net"
   ]
+}
+
+## Prometheus
+variable "enable_prometheus_monitoring" {
+  description = "Deploy Prometheus monitoring resources with the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "prometheus_workspace_public_access_enabled" {
+  description = "Enable public access to the Azure Monitor workspace for prometheus"
+  type        = bool
+  default     = true
+}
+
+variable "prometheus_monitoring_private_endpoint_subnet_id" {
+  description = "The ID of a subnet to create a private endpoint for Prometheus monitoring"
+  type        = string
+  default     = null
 }
 
 variable "tags" {

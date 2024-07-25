@@ -375,6 +375,91 @@ module "application_insights" {
   })
 }
 
+module "prometheus_monitor_workspace" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_workspace/azurerm"
+  version = "~> 1.0"
+
+  count = var.enable_prometheus_monitoring ? 1 : 0
+
+  name                = module.resource_names["prometheus_monitor_workspace"].standard
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location            = var.region
+
+  public_network_access_enabled = var.prometheus_workspace_public_access_enabled
+
+  tags = merge(var.tags, { resource_name = module.resource_names["prometheus_monitor_workspace"].standard })
+}
+
+module "prometheus_monitor_data_collection" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_prometheus/azurerm"
+  version = "~> 1.0"
+
+  count = var.enable_prometheus_monitoring ? 1 : 0
+
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location            = var.region
+
+  monitor_workspace_id = module.prometheus_monitor_workspace[0].id
+
+  aks_cluster_id = module.aks.aks_id
+
+  data_collection_endpoint_name = module.resource_names["prometheus_data_collection_endpoint"].standard
+  data_collection_rule_name     = module.resource_names["prometheus_data_collection_rule"].standard
+}
+
+module "prometheus_monitor_workspace_private_dns_zone" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
+  version = "~> 1.0"
+
+  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+
+  zone_name           = replace(module.prometheus_monitor_workspace[0].query_endpoint, "/https:\\/\\/.*?\\.(.*)/", "privatelink.$1")
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  tags = local.tags
+
+  depends_on = [module.resource_group, module.prometheus_monitor_workspace]
+}
+
+module "prometheus_monitor_workspace_vnet_link" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
+  version = "~> 1.0"
+
+  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+
+  link_name             = module.prometheus_monitor_workspace[0].name
+  resource_group_name   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_dns_zone_name = module.prometheus_monitor_workspace_private_dns_zone[0].zone_name
+  virtual_network_id    = join("/", slice(split("/", var.vnet_subnet_id), 0, 9))
+  registration_enabled  = false
+
+  tags = local.tags
+
+  depends_on = [module.resource_group, module.prometheus_monitor_workspace_private_dns_zone]
+}
+
+module "prometheus_monitor_workspace_private_endpoint" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
+  version = "~> 1.0"
+
+  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+
+  region                          = var.region
+  endpoint_name                   = module.resource_names["prometheus_endpoint"].standard
+  is_manual_connection            = false
+  resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  private_service_connection_name = module.resource_names["prometheus_service_connection"].standard
+  private_connection_resource_id  = module.prometheus_monitor_workspace[0].id
+  subresource_names               = ["prometheusMetrics"]
+  subnet_id                       = var.prometheus_monitoring_private_endpoint_subnet_id
+  private_dns_zone_ids            = [module.prometheus_monitor_workspace_private_dns_zone[0].id]
+  private_dns_zone_group_name     = "prometheusMetrics"
+
+  tags = merge(var.tags, { resource_name = module.resource_names["prometheus_endpoint"].standard })
+
+  depends_on = [module.resource_group, module.prometheus_monitor_workspace, module.prometheus_monitor_workspace_private_dns_zone]
+}
+
 module "monitor_private_link_scope" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/azure_monitor_private_link_scope/azurerm"
   version = "~> 1.0"
@@ -388,10 +473,15 @@ module "monitor_private_link_scope" {
     resource_name = module.resource_names["monitor_private_link_scope"].standard
   })
 
-  linked_resource_ids = {
-    aks_monitor_workspace = module.aks.azurerm_log_analytics_workspace_id
-    application_insights  = module.application_insights[0].id
-  }
+  linked_resource_ids = merge({
+    aks_log_analytics_workspace = module.aks.azurerm_log_analytics_workspace_id
+    }, length(module.application_insights) > 0 ? {
+    application_insights = module.application_insights[0].id
+    } : {}, length(module.prometheus_monitor_workspace) > 0 ? {
+    prometheus_monitor_workspace = module.prometheus_monitor_workspace[0].default_data_collection_endpoint_id
+    } : {}, length(module.prometheus_monitor_data_collection) > 0 ? {
+    prometheus_data_collection = module.prometheus_monitor_data_collection[0].data_collection_endpoint_id
+  } : {})
 }
 
 module "monitor_private_link_scope_dns_zone" {
