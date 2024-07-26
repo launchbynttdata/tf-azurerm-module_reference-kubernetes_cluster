@@ -198,7 +198,7 @@ module "subnet_route_table_assoc" {
 
 module "aks" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                        = var.region
@@ -268,11 +268,8 @@ module "aks" {
   node_pools          = var.node_pools
   node_resource_group = var.node_resource_group
 
-  ingress_application_gateway_enabled     = var.ingress_application_gateway_enabled
-  ingress_application_gateway_name        = var.ingress_application_gateway_enabled ? module.resource_names["application_gateway"].dns_compliant_minimal : null
-  ingress_application_gateway_subnet_cidr = var.ingress_application_gateway_subnet_cidr
-  ingress_application_gateway_id          = var.ingress_application_gateway_id
-  ingress_application_gateway_subnet_id   = var.ingress_application_gateway_subnet_id
+  green_field_application_gateway_for_ingress = var.green_field_application_gateway_for_ingress
+  brown_field_application_gateway_for_ingress = var.brown_field_application_gateway_for_ingress
 
   web_app_routing     = var.web_app_routing
   attached_acr_id_map = var.attached_acr_id_map
@@ -292,6 +289,25 @@ module "aks" {
   rbac_aad_server_app_id            = var.rbac_aad_server_app_id
   rbac_aad_server_app_secret        = var.rbac_aad_server_app_secret
   local_account_disabled            = var.local_account_disabled
+
+  # Log analytics
+  cluster_log_analytics_workspace_name                            = var.cluster_log_analytics_workspace_name
+  log_analytics_workspace                                         = var.log_analytics_workspace
+  log_analytics_workspace_allow_resource_only_permissions         = var.log_analytics_workspace_allow_resource_only_permissions
+  log_analytics_workspace_cmk_for_query_forced                    = var.log_analytics_workspace_cmk_for_query_forced
+  log_analytics_workspace_daily_quota_gb                          = var.log_analytics_workspace_daily_quota_gb
+  log_analytics_workspace_data_collection_rule_id                 = var.log_analytics_workspace_data_collection_rule_id
+  log_analytics_workspace_enabled                                 = var.log_analytics_workspace_enabled
+  log_analytics_workspace_resource_group_name                     = var.log_analytics_workspace_resource_group_name
+  log_analytics_workspace_sku                                     = var.log_analytics_workspace_sku
+  log_analytics_workspace_identity                                = var.log_analytics_workspace_identity
+  log_analytics_workspace_immediate_data_purge_on_30_days_enabled = var.log_analytics_workspace_immediate_data_purge_on_30_days_enabled
+  log_analytics_workspace_internet_ingestion_enabled              = var.log_analytics_workspace_internet_ingestion_enabled
+  log_analytics_workspace_internet_query_enabled                  = var.log_analytics_workspace_internet_query_enabled
+  log_analytics_workspace_local_authentication_disabled           = var.log_analytics_workspace_local_authentication_disabled
+  log_analytics_workspace_reservation_capacity_in_gb_per_day      = var.log_analytics_workspace_reservation_capacity_in_gb_per_day
+
+  log_retention_in_days = var.log_retention_in_days
 
   oidc_issuer_enabled       = var.oidc_issuer_enabled
   workload_identity_enabled = var.workload_identity_enabled
