@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 product_family  = "dso"
-product_service = "pub"
+product_service = "kube"
 agents_size     = "Standard_D2_v2"
 
 node_pools = {
@@ -29,3 +29,5 @@ node_pools = {
     os_type = "Linux"
   }
 }
+
+log_analytics_workspace_daily_quota_gb = 5

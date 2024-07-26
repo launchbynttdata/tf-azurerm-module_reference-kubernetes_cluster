@@ -36,6 +36,7 @@ module "aks" {
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
 
+  log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 
   secrets = {
     username = "test102"

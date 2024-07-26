@@ -237,6 +237,19 @@ variable "application_insights" {
   default = {}
 }
 
+## Log analytics
+variable "log_analytics_workspace_internet_ingestion_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should the Log Analytics Workspace support ingestion over the Public Internet?"
+}
+
+variable "log_analytics_workspace_internet_query_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should the Log Analytics Workspace support querying over the Public Internet?"
+}
+
 ## Private Link Scope
 
 variable "create_monitor_private_link_scope" {
