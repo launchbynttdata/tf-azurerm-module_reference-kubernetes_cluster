@@ -97,6 +97,9 @@ module "aks" {
   agents_pool_name          = var.agents_pool_name
   os_disk_size_gb           = var.os_disk_size_gb
 
+  log_analytics_workspace_internet_ingestion_enabled = var.log_analytics_workspace_internet_ingestion_enabled
+  log_analytics_workspace_internet_query_enabled     = var.log_analytics_workspace_internet_query_enabled
+
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   secret_rotation_enabled            = var.secret_rotation_enabled
   secret_rotation_interval           = var.secret_rotation_interval

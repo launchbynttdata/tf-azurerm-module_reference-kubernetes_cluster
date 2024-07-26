@@ -150,6 +150,19 @@ variable "private_cluster_enabled" {
   description = "If true cluster API server will be exposed only on internal IP address and available only in cluster vnet."
 }
 
+## Log analytics
+variable "log_analytics_workspace_internet_ingestion_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should the Log Analytics Workspace support ingestion over the Public Internet?"
+}
+
+variable "log_analytics_workspace_internet_query_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should the Log Analytics Workspace support querying over the Public Internet?"
+}
+
 variable "net_profile_dns_service_ip" {
   type        = string
   default     = null
