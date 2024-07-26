@@ -268,7 +268,12 @@ module "aks" {
   node_pools          = var.node_pools
   node_resource_group = var.node_resource_group
 
-  green_field_application_gateway_for_ingress = var.green_field_application_gateway_for_ingress
+  green_field_application_gateway_for_ingress = var.green_field_application_gateway_for_ingress != null ? merge(
+    {
+      name = module.resource_names["application_gateway"].dns_compliant_minimal
+    },
+    var.green_field_application_gateway_for_ingress,
+  ) : null
   brown_field_application_gateway_for_ingress = var.brown_field_application_gateway_for_ingress
 
   web_app_routing     = var.web_app_routing
