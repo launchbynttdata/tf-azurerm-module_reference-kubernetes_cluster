@@ -406,7 +406,7 @@ module "prometheus_monitor_workspace" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_workspace/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.brown_field_prometheus_monitor_workspace_id == null ? 1 : 0
 
   name                = module.resource_names["prometheus_monitor_workspace"].standard
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
@@ -431,7 +431,7 @@ module "prometheus_monitor_data_collection" {
   default_rule_group_interval = var.prometheus_default_rule_group_interval
   rule_groups                 = var.prometheus_rule_groups
 
-  monitor_workspace_id = module.prometheus_monitor_workspace[0].id
+  monitor_workspace_id = var.brown_field_prometheus_monitor_workspace_id != null ? var.brown_field_prometheus_monitor_workspace_id : module.prometheus_monitor_workspace[0].id
 
   aks_cluster_id = module.aks.aks_id
 
@@ -505,15 +505,7 @@ module "monitor_private_link_scope" {
     resource_name = module.resource_names["monitor_private_link_scope"].standard
   })
 
-  linked_resource_ids = merge({
-    aks_log_analytics_workspace = module.aks.azurerm_log_analytics_workspace_id
-    }, length(module.application_insights) > 0 ? {
-    application_insights = module.application_insights[0].id
-    } : {}, length(module.prometheus_monitor_workspace) > 0 ? {
-    prometheus_monitor_workspace = module.prometheus_monitor_workspace[0].default_data_collection_endpoint_id
-    } : {}, length(module.prometheus_monitor_data_collection) > 0 ? {
-    prometheus_data_collection = module.prometheus_monitor_data_collection[0].data_collection_endpoint_id
-  } : {})
+  linked_resource_ids = local.monitor_private_link_scoped_resource_ids
 
   depends_on = [module.resource_group, module.aks, module.application_insights, module.prometheus_monitor_workspace, module.prometheus_monitor_data_collection]
 }
@@ -569,4 +561,16 @@ module "monitor_private_link_scope_private_endpoint" {
   tags = merge(var.tags, { resource_name = module.resource_names["monitor_private_link_scope_endpoint"].standard })
 
   depends_on = [module.resource_group, module.monitor_private_link_scope, module.monitor_private_link_scope_dns_zone]
+}
+
+module "monitor_private_link_scoped_service" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_private_link_scoped_service/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.brown_field_monitor_private_link_scope_id != null ? local.monitor_private_link_scoped_resource_ids : {}
+
+  monitor_private_link_scope_id = var.brown_field_monitor_private_link_scope_id
+
+  name        = each.key
+  resource_id = each.value
 }
