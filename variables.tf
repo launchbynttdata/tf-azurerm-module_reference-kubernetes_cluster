@@ -1260,6 +1260,15 @@ variable "create_monitor_private_link_scope" {
   default     = false
 }
 
+variable "brown_field_monitor_private_link_scope_id" {
+  description = <<-EOF
+    An existing monitor private link scope to associate with azure monitor resources.
+    Usable only when `create_monitor_private_link_scope` is `false`.
+  EOF
+  type        = string
+  default     = null
+}
+
 variable "monitor_private_link_scope_subnet_id" {
   description = "The ID of the subnet to associate with the Azure Monitor private link scope"
   type        = string
@@ -1284,6 +1293,12 @@ variable "enable_prometheus_monitoring" {
   description = "Deploy Prometheus monitoring resources with the AKS cluster"
   type        = bool
   default     = false
+}
+
+variable "brown_field_prometheus_monitor_workspace_id" {
+  description = "The ID of an existing Azure Monitor workspace to use for Prometheus monitoring"
+  type        = string
+  default     = null
 }
 
 variable "prometheus_workspace_public_access_enabled" {
