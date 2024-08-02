@@ -505,7 +505,7 @@ module "monitor_private_link_scope" {
     resource_name = module.resource_names["monitor_private_link_scope"].standard
   })
 
-  linked_resource_ids = local.monitor_private_link_scoped_resource_ids
+  linked_resource_ids = { for key, resource in local.monitor_private_link_scoped_resources : resource.name => resource.id }
 
   depends_on = [module.resource_group, module.aks, module.application_insights, module.prometheus_monitor_workspace, module.prometheus_monitor_data_collection]
 }
@@ -567,10 +567,10 @@ module "monitor_private_link_scoped_service" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_private_link_scoped_service/azurerm"
   version = "~> 1.0"
 
-  for_each = var.brown_field_monitor_private_link_scope_id != null ? local.monitor_private_link_scoped_resource_ids : {}
+  for_each = var.brown_field_monitor_private_link_scope_id != null ? local.monitor_private_link_scoped_resources : {}
 
   monitor_private_link_scope_id = var.brown_field_monitor_private_link_scope_id
 
-  name        = each.key
-  resource_id = each.value
+  name        = each.value.name
+  resource_id = each.value.id
 }
