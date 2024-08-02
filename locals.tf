@@ -38,15 +38,32 @@ locals {
     next_hop_in_ip_address = try(var.user_defined_routing.azure_firewall_private_ip_address, null)
   } : {}
 
-  monitor_private_link_scoped_resource_ids = merge({
-    aks_log_analytics_workspace = module.aks.azurerm_log_analytics_workspace_id
-    }, length(module.application_insights) > 0 ? {
-    application_insights = module.application_insights[0].id
-    } : {}, length(module.prometheus_monitor_workspace) > 0 ? {
-    prometheus_monitor_workspace = module.prometheus_monitor_workspace[0].default_data_collection_endpoint_id
-    } : {}, length(module.prometheus_monitor_data_collection) > 0 ? {
-    prometheus_data_collection = module.prometheus_monitor_data_collection[0].data_collection_endpoint_id
-  } : {})
+  monitor_private_link_scoped_resources = merge(
+    {
+      aks_log_analytics_workspace = {
+        id   = module.aks.azurerm_log_analytics_workspace_id
+        name = module.aks.azurerm_log_analytics_workspace_name
+      }
+    },
+    length(module.application_insights) > 0 ? {
+      application_insights = {
+        id   = module.application_insights[0].id
+        name = module.application_insights[0].name
+      }
+    } : {},
+    length(module.prometheus_monitor_workspace) > 0 ? {
+      prometheus_monitor_workspace = {
+        id   = module.prometheus_monitor_workspace[0].default_data_collection_endpoint_id
+        name = module.prometheus_monitor_workspace[0].name
+      }
+    } : {},
+    length(module.prometheus_monitor_data_collection) > 0 ? {
+      prometheus_monitor_data_collection = {
+        id   = module.prometheus_monitor_data_collection[0].data_collection_endpoint_id
+        name = module.prometheus_monitor_data_collection[0].data_collection_endpoint_name
+      }
+    } : {}
+  )
 
   udr_routes = {
     all-traffic = local.udr_outbound_route
