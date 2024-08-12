@@ -213,6 +213,7 @@ module "aks" {
   cluster_name                    = module.resource_names["aks"].dns_compliant_minimal
   api_server_subnet_id            = var.api_server_subnet_id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  azure_policy_enabled            = var.azure_policy_enabled
 
   # Auto scaling
   enable_auto_scaling                                  = var.enable_auto_scaling

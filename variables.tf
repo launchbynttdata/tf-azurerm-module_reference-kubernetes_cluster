@@ -176,6 +176,12 @@ variable "private_cluster_public_fqdn_enabled" {
   description = "(Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to `false`."
 }
 
+variable "azure_policy_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable Azure Policy add-on for AKS cluster? Defaults to `false`."
+}
+
 variable "additional_vnet_links" {
   description = "A list of VNET IDs for which vnet links to be created with the private AKS cluster DNS Zone. Applicable only when private_cluster_enabled is true."
   type        = map(string)
