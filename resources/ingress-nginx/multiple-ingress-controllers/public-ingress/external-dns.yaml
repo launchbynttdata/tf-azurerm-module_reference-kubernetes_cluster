@@ -43,23 +43,28 @@ spec:
       labels:
         app: external-dns-public
     spec:
-      serviceAccountName: external-dns-public
-      containers:
-        - name: external-dns-public
-          image: registry.k8s.io/external-dns/external-dns:v0.14.0
-          args:
-            - --ingress-class=public-ingress
-            - --source=service
-            - --source=ingress
-            #- --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
-            - --provider=azure
-            #- --azure-resource-group=MyDnsResourceGroup # (optional) use the DNS zones from the tutorial's resource group
-            - --txt-prefix=extdnspublic-
-          volumeMounts:
-            - name: azure-config-file-public
-              mountPath: /etc/kubernetes
-              readOnly: true
-      volumes:
-        - name: azure-config-file-public
-          secret:
-            secretName: azure-config-file-public
+          serviceAccountName: external-dns-public
+          containers:
+            - name: external-dns-public
+              image: registry.k8s.io/external-dns/external-dns:v0.14.0
+              args:
+                - --ingress-class=public-ingress
+                - --source=service
+                - --source=ingress
+                - --domain-filter=sandbox.launch.nttdata.com # limit to only sandbox.launch.nttdata.com subdomain
+                - --provider=aws
+                - --aws-zone-type=public
+                - --txt-prefix=extdnspublic-
+              env:
+                - name: AWS_SDK_LOAD_CONFIG
+                  value: "true"
+                - name: AWS_SHARED_CREDENTIALS_FILE
+                  value: "/etc/aws/credentials/aws-credentials.ini"
+              volumeMounts:
+                - name: aws-config-file-public
+                  mountPath: /etc/aws/credentials
+                  readOnly: true
+          volumes:
+            - name: aws-config-file-public
+              secret:
+                secretName: aws-config-file-public # pragma: allowlist secret

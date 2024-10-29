@@ -150,10 +150,10 @@ module "route_table" {
 
   count = var.net_profile_outbound_type == "userDefinedRouting" ? 1 : 0
 
-  name                          = module.resource_names["route_table"].standard
-  location                      = var.region
-  disable_bgp_route_propagation = var.disable_bgp_route_propagation
-  resource_group_name           = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  name     = module.resource_names["route_table"].standard
+  location = var.region
+  #disable_bgp_route_propagation = var.disable_bgp_route_propagation
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   tags = merge(local.tags, {
     resource_name = module.resource_names["route_table"].standard
   })

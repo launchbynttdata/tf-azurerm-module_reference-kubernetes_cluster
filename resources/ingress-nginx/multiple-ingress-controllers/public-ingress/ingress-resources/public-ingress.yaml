@@ -12,10 +12,10 @@ spec:
   ingressClassName: public-ingress
   tls:
     - hosts:
-      - public-app.sandbox.launch.dresdencraft.com
-      secretName: hello-world-ingress-public-tls
+      - demo-aks.sandbox.launch.nttdata.com
+      secretName: hello-world-ingress-public-tls # pragma: allowlist secret
   rules:
-  - host: public-app.sandbox.launch.dresdencraft.com
+  - host: demo-aks.sandbox.launch.nttdata.com
     http:
       paths:
         - path: /
