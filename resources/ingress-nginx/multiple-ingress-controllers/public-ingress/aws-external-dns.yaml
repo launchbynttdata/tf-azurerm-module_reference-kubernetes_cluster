@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: hello-world-ingress-public
+  name: hello-world-ingress-public-aws
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -12,16 +12,16 @@ spec:
   ingressClassName: public-ingress
   tls:
     - hosts:
-      - public-app.sandbox.launch.dresdencraft.com
+        - sandbox.launch.nttdata.com
       secretName: hello-world-ingress-public-tls # pragma: allowlist secret
   rules:
-  - host: public-app.sandbox.launch.dresdencraft.com
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: aks-helloworld-two
-              port:
-                number: 80
+    - host: sandbox.launch.nttdata.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aks-helloworld-two
+                port:
+                  number: 80
