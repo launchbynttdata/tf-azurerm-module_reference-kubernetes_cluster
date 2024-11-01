@@ -3,25 +3,25 @@ kind: Ingress
 metadata:
   name: hello-world-ingress-tls
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: public-ingress
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     cert-manager.io/cluster-issuer: "letsencrypt-cluster"
 spec:
-  ingressClassName: nginx
+  ingressClassName: public-ingress
   tls:
     - hosts:
         - demo-tls.sandbox.launch.nttdata.com
       secretName: hello-world-ingress-tls # pragma: allowlist secret
   rules:
-    - host: demo-tls.sandbox.launch.nttdata.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: aks-helloworld-two
-                port:
-                  number: 80
+  - host: demo-tls.sandbox.launch.nttdata.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: aks-helloworld-two
+              port:
+                number: 80

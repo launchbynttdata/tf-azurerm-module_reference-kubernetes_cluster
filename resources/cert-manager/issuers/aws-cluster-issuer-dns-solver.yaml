@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-route53
+spec:
+  acme:
+    email: alanantonio.ruiseco@nttdata.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-route53
+    solvers:
+    - dns01:
+        route53:
+          region: us-east-1
+          hostedZoneID: Z0784995304VEG2Z7RSRF
+          accessKeyIDSecretRef:
+            name: aws-credentials
+            key: access-key-id
+          secretAccessKeySecretRef:
+            name: aws-credentials
+            key: secret-access-key
