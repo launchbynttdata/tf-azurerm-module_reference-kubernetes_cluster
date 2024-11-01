@@ -33,3 +33,23 @@ kubectl get secret aws-credentials
 You should see the `aws-credentials` secret listed.
 
 That's it! You have successfully created the `aws-credentials` secret in your Kubernetes cluster.
+
+
+## Installation (using helm)
+
+- Install cert-manager using helm. Use `--installCRDs=true` to install CRDs with helm installation.
+    ```shell
+
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    helm install \
+      cert-manager jetstack/cert-manager \
+      --namespace cert-manager \
+      --create-namespace \
+      --set installCRDs=true
+
+    # https://stackoverflow.com/questions/60989753/cert-manager-is-failing-with-waiting-for-dns-01-challenge-propagation-could-not
+     helm upgrade cert-manager jetstack/cert-manager \
+        -n cert-manager --reuse-values
+    ```

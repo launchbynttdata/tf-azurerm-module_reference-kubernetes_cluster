@@ -45,27 +45,45 @@ This command will create a secret in your Kubernetes cluster that contains the A
    ```
 
 
-4. Refers from step 4 until the end of file [azure readme](../azure/README.md)
 
-### Verifying the Secret
-To verify that the secret has been created successfully, you can use the following command:
+
+4. In case you want the public IP attached to the load balancer `kubernetes` that is associated with the public ingress controller to be static, we need to reserve a static IP
+5. Deploy public ingress-nginx
+
+   ```shell
+      helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+      helm repo update
+      # The azure-load-balancer-health-probe-request-path is very important for public ingress
+      helm install public-ingress-nginx ingress-nginx/ingress-nginx \
+      --namespace public-ingress \
+      --create-namespace \
+      --set controller.replicaCount=1 \
+      --set controller.ingressClassResource.controllerValue=k8s.io/public-ingress-nginx \
+      --set controller.ingressClass=public-ingress \
+      --set controller.ingressClassResource.name=public-ingress \
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
+      --set controller.allowSnippetAnnotations=true
+
+   ```
+
+Once the deployment is successful, you can check the helm release using the command
 
 ```shell
-kubectl get secret aws-config-file-public
+$ helm list -n public-ingress
+NAME                    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+public-ingress-nginx    public-ingress  2               2024-01-10 16:22:51.914314 -0500 EST    deployed        ingress-nginx-4.9.0     1.9.5
 ```
 
-This will display information about the secret, confirming its creation.
-
-### Usage
-You can now use this secret in your Kubernetes deployments, pods, or other resources that require access to AWS credentials.
-
-### Cleanup
-If you need to delete the secret, you can use the following command:
+Check the controller service for the assigned IP Address
 
 ```shell
-kubectl delete secret aws-config-file-public
+$ kube get svc -n public-ingress
+NAME                                        TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                      AGE
+public-ingress-nginx-controller             LoadBalancer   10.0.181.211   4.156.171.98   80:30506/TCP,443:32157/TCP   22h
+public-ingress-nginx-controller-admission   ClusterIP      10.0.253.64    <none>         443/TCP                      22h
+
 ```
 
-This will remove the secret from your Kubernetes cluster.
+## Testing
 
-By following these steps, you can securely manage your AWS credentials within your Kubernetes environment.
+At this point, the ingress controller is ready to serve requests to create ingress objects. You need to deploy a sample  [application](../../sample-app/) and create an ingress resource as provided in [ingress-resources](./ingress-resources/)

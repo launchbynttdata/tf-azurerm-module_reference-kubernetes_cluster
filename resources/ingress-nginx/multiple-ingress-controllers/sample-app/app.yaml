@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: aks-helloworld-two
-        image: 020127659860.dkr.ecr.us-east-2.amazonaws.com/launch-api:5f775626e2e7b9cc865293af623de1028cd15b4b
+        image: 020127659860.dkr.ecr.us-east-2.amazonaws.com/launch-api:latest
         ports:
         - containerPort: 8080
         env:
