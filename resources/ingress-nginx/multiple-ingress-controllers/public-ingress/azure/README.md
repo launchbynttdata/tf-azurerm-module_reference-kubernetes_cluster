@@ -14,21 +14,25 @@ created, that would refer to this public ingress (done by annotation
 `ingress.class` on the ingress metadata), an A-record would be created in
 the associated public DNS zone.
 
-
 ## Install public ingress
 
 1. Create a `azure.json` file and fill up all the necessary details. The `userAssignedIdentityID` should be the Kubenet MSI client ID
 2. Create a secret using the above `azure.json`. This secret is consumed by the `external-dns` module
+
     ```
    kubectl create secret generic azure-config-file-public \
      --from-file="../common/ingress-nginx/multiple-ingress-controllers/public-ingress/azure.json"
    ```
+
 3. Deploy the `external_dns` manifest file
+
     ```
    kube apply -f ../common/ingress-nginx/multiple-ingress-controllers/public-ingress/external-dns.yaml
    ```
+
 4. In case you want the public IP attached to the load balancer `kubernetes` that is associated with the public ingress controller to be static, we need to reserve a static IP
 5. Deploy public ingress-nginx
+
    ```shell
       helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
       helm repo update
@@ -44,7 +48,9 @@ the associated public DNS zone.
       --set controller.allowSnippetAnnotations=true
 
    ```
+
 Once the deployment is successful, you can check the helm release using the command
+
 ```shell
 $ helm list -n public-ingress
 NAME                    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
@@ -52,6 +58,7 @@ public-ingress-nginx    public-ingress  2               2024-01-10 16:22:51.9143
 ```
 
 Check the controller service for the assigned IP Address
+
 ```shell
 $ kube get svc -n public-ingress
 NAME                                        TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                      AGE
@@ -61,4 +68,5 @@ public-ingress-nginx-controller-admission   ClusterIP      10.0.253.64    <none>
 ```
 
 ## Testing
+
 At this point, the ingress controller is ready to serve requests to create ingress objects. You need to deploy a sample  [application](../sample-app) and create an ingress resource as provided in [ingress-resources](./ingress-resources)
