@@ -6,14 +6,13 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     cert-manager.io/cluster-issuer: "letsencrypt-cluster"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
         - app-tls.sandbox.launch.dresdencraft.com
-      secretName: hello-world-ingress-tls
+      secretName: hello-world-ingress-tls # pragma: allowlist secret
   rules:
   - host: app-tls.sandbox.launch.dresdencraft.com
     http:

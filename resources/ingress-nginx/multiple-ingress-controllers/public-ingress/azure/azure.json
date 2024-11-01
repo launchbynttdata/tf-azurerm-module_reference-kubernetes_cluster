@@ -1,0 +1,7 @@
+{
+  "tenantId": "51ec3334-c8f6-4e64-a985-4b17e46e6f9e",
+  "subscriptionId": "4554e249-e00f-4668-9be3-da31ed200163",
+  "resourceGroup": "ref-k8s-eus-dev-000-rg-000",
+  "useManagedIdentityExtension": true,
+  "userAssignedIdentityID": "c615e7c0-db5e-4080-854b-8da9742298eb"
+}

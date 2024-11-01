@@ -12,7 +12,7 @@ spec:
   tls:
     - hosts:
       - public-app.launch.dresdencraft.com
-      secretName: hello-world-ingress-public-2-tls
+      secretName: hello-world-ingress-public-2-tls # pragma: allowlist secret
   rules:
   - host: public-app.launch.dresdencraft.com
     http:

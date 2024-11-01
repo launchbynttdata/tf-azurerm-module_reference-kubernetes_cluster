@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
       - name: aks-helloworld-two
-        image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+        image: 020127659860.dkr.ecr.us-east-2.amazonaws.com/launch-api
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         env:
         - name: TITLE
           value: "AKS Ingress Demo"
+      imagePullSecrets:
+      - name: docker-secret
 ---
 apiVersion: v1
 kind: Service
@@ -29,5 +31,7 @@ spec:
   type: ClusterIP
   ports:
   - port: 80
+    name: http
+    targetPort: 8080
   selector:
     app: aks-helloworld-two

@@ -5,7 +5,7 @@ metadata:
   name: my-selfsigned-ca
   namespace: cert-manager
 spec:
-  secretName: my-selfsigned-ca
+  secretName: my-selfsigned-ca # pragma: allowlist secret
   isCA: true
   commonName: my-selfsigned-ca
 
@@ -23,4 +23,4 @@ metadata:
   name: my-ca-issuer
 spec:
   ca:
-    secretName: my-selfsigned-ca
+    secretName: my-selfsigned-ca # pragma: allowlist secret

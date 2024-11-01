@@ -1,7 +1,0 @@
-{
-  "tenantId": "c5836784-c046-4f73-9e7e-9c370262e295",
-  "subscriptionId": "e71eb3cd-83f2-46eb-8f47-3b779e27672f",
-  "resourceGroup": "public-dns-eastus-rg-000",
-  "useManagedIdentityExtension": true,
-  "userAssignedIdentityID": "3a8999ad-2d96-4002-b52b-5ca1b26f4f42"
-}
