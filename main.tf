@@ -575,3 +575,19 @@ module "monitor_private_link_scoped_service" {
   name        = each.value.name
   resource_id = each.value.id
 }
+
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+
+resource "kubernetes_manifest" "deployment" {
+  manifest = yamldecode(file("${path.module}/resources/aws-sample-app/app.yaml"))
+}
+
+resource "kubernetes_manifest" "service" {
+  manifest = yamldecode(file("${path.module}/resources/aws-sample-app/service.yaml"))
+}
+
+resource "kubernetes_manifest" "ingress" {
+  manifest = yamldecode(file("${path.module}/resources/aws-sample-app/aws-public-ingress.yaml"))
+}

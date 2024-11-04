@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: aks-helloworld-two
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
       - name: aks-helloworld-two
-        image: dsopublic.azurecr.io/launch-api:latest
+        image: dsopublic.azurecr.io/launch-demo-java-hex-app:latest
         ports:
         - containerPort: 8080
         env:
