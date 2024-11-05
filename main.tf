@@ -577,7 +577,10 @@ module "monitor_private_link_scoped_service" {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  host                   = module.aks.host
+  client_certificate     = base64decode(module.aks.client_certificate)
+  client_key             = base64decode(module.aks.client_key)
+  cluster_ca_certificate = base64decode(module.aks.cluster_ca_certificate)
 }
 
 resource "kubernetes_manifest" "deployment" {
