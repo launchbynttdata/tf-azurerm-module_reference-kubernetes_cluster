@@ -15,19 +15,6 @@ locals {
     provisioner = "Terraform"
   }
 
-  # Fetching the Vnet ID from input subnet ID
-  vnet_id           = var.vnet_subnet_id != null ? join("/", slice(split("/", var.vnet_subnet_id), 0, 9)) : null
-  resource_group_id = var.resource_group_name != null ? data.azurerm_resource_group.rg[0].id : module.resource_group[0].id
-
-  # The Cluster MSI needs a `Network Contributer` role assignment on the VNet for BYO VNet scenarios
-  vnet_role_assignment = local.vnet_id != null ? {
-    "vnet" = ["Network Contributor", local.vnet_id]
-  } : {}
-
-  cluster_identity_role_assignments = var.identity_type == "UserAssigned" ? merge({
-    "rg" = ["Contributor", local.resource_group_id]
-  }, local.vnet_role_assignment, var.cluster_identity_role_assignments) : var.cluster_identity_role_assignments
-
   # A route is mandatory for all outbound traffic to a next hop type of VirtualAppliance to an Azure Firewall in this case
   udr_outbound_route = var.net_profile_outbound_type == "userDefinedRouting" ? {
     name                   = "all-traffic"
