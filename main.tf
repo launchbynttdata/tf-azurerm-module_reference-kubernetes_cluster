@@ -163,12 +163,6 @@ module "vnet_links" {
   depends_on = [module.private_cluster_dns_zone, module.resource_group]
 }
 
-data "azurerm_resource_group" "rg" {
-  count = var.resource_group_name != null ? 1 : 0
-
-  name = var.resource_group_name
-}
-
 # Route table creation is required for user-defined routing
 module "route_table" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm"

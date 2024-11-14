@@ -160,9 +160,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.0 |
+No providers.
 
 ## Modules
 
@@ -199,9 +197,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+No resources.
 
 ## Inputs
 
