@@ -1313,6 +1313,12 @@ variable "prometheus_workspace_public_access_enabled" {
   default     = true
 }
 
+variable "enable_prometheus_monitoring_private_endpoint" {
+  description = "Enable private endpoint for Prometheus monitoring"
+  type        = bool
+  default     = false
+}
+
 variable "prometheus_monitoring_private_endpoint_subnet_id" {
   description = "The ID of a subnet to create a private endpoint for Prometheus monitoring"
   type        = string

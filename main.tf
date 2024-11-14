@@ -444,7 +444,7 @@ module "prometheus_monitor_workspace_private_dns_zone" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.enable_prometheus_monitoring_private_endpoint ? 1 : 0
 
   zone_name           = replace(module.prometheus_monitor_workspace[0].query_endpoint, "/https:\\/\\/.*?\\.(.*)/", "privatelink.$1")
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
@@ -458,7 +458,7 @@ module "prometheus_monitor_workspace_vnet_link" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.enable_prometheus_monitoring_private_endpoint ? 1 : 0
 
   link_name             = module.prometheus_monitor_workspace[0].name
   resource_group_name   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
@@ -475,7 +475,7 @@ module "prometheus_monitor_workspace_private_endpoint" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.enable_prometheus_monitoring_private_endpoint ? 1 : 0
 
   region                          = var.region
   endpoint_name                   = module.resource_names["prometheus_endpoint"].standard

@@ -13,6 +13,8 @@ network_plugin = "kubenet"
 
 private_cluster_enabled = true
 
+enable_prometheus_monitoring_private_endpoint = true
+
 # User Assigned Managed Identity will be automatically created
 identity_type = "UserAssigned"
 
