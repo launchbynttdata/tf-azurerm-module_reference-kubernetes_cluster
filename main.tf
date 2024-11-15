@@ -12,7 +12,7 @@
 
 module "resource_names" {
   source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   for_each = var.resource_names_map
 
@@ -106,6 +106,19 @@ module "cluster_identity" {
   depends_on = [module.resource_group]
 }
 
+module "cluster_identity_roles" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.identity_type == "UserAssigned" ? var.cluster_identity_role_assignments : {}
+
+  principal_id         = module.cluster_identity[0].principal_id
+  role_definition_name = each.value[0]
+  scope                = each.value[1]
+
+  depends_on = [module.cluster_identity, module.resource_group]
+}
+
 module "private_cluster_dns_zone" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
   version = "~> 1.0"
@@ -118,6 +131,19 @@ module "private_cluster_dns_zone" {
   tags = local.tags
 
   depends_on = [module.resource_group]
+}
+
+module "cluster_identity_private_dns_contributor" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  count = var.identity_type == "UserAssigned" && var.private_cluster_enabled ? 1 : 0
+
+  principal_id         = module.cluster_identity[0].principal_id
+  role_definition_name = "Private DNS Zone Contributor"
+  scope                = module.private_cluster_dns_zone[0].id
+
+  depends_on = [module.cluster_identity, module.private_cluster_dns_zone]
 }
 
 module "vnet_links" {
@@ -135,12 +161,6 @@ module "vnet_links" {
   tags = local.tags
 
   depends_on = [module.private_cluster_dns_zone, module.resource_group]
-}
-
-data "azurerm_resource_group" "rg" {
-  count = var.resource_group_name != null ? 1 : 0
-
-  name = var.resource_group_name
 }
 
 # Route table creation is required for user-defined routing
@@ -330,27 +350,7 @@ module "aks" {
     resource_name = module.resource_names["aks"].standard
   })
 
-  depends_on = [module.resource_group, module.private_cluster_dns_zone, module.cluster_identity, module.subnet_route_table_assoc]
-}
-
-# Assign the cluster identity the required roles on RG and VNet
-#
-# TODO: fix role assignments so that it works with the `private-cluster` and `private-complete` examples
-#   - `local.cluster_identity_role_assignments` only has a 'vnet' key if the `vnet_subnet_id` is not null
-#   - in the 'private-cluster` example, `vnet_subnet_id` is set to the output of the `vnet` module, which is not known until during the apply
-#   - therefore this for_each fails, since this module doesn't know whether `vnet_subnet_id` is null before the apply
-
-module "cluster_identity_roles" {
-  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
-
-  for_each = local.cluster_identity_role_assignments
-
-  principal_id         = module.cluster_identity[0].principal_id
-  role_definition_name = each.value[0]
-  scope                = each.value[1]
-
-  depends_on = [module.cluster_identity, module.resource_group]
+  depends_on = [module.resource_group, module.subnet_route_table_assoc, module.cluster_identity_private_dns_contributor]
 }
 
 module "node_pool_identity_roles" {
@@ -444,7 +444,7 @@ module "prometheus_monitor_workspace_private_dns_zone" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.enable_prometheus_monitoring_private_endpoint ? 1 : 0
 
   zone_name           = replace(module.prometheus_monitor_workspace[0].query_endpoint, "/https:\\/\\/.*?\\.(.*)/", "privatelink.$1")
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
@@ -458,7 +458,7 @@ module "prometheus_monitor_workspace_vnet_link" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.enable_prometheus_monitoring_private_endpoint ? 1 : 0
 
   link_name             = module.prometheus_monitor_workspace[0].name
   resource_group_name   = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
@@ -475,7 +475,7 @@ module "prometheus_monitor_workspace_private_endpoint" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
   version = "~> 1.0"
 
-  count = var.enable_prometheus_monitoring && var.prometheus_monitoring_private_endpoint_subnet_id != null ? 1 : 0
+  count = var.enable_prometheus_monitoring && var.enable_prometheus_monitoring_private_endpoint ? 1 : 0
 
   region                          = var.region
   endpoint_name                   = module.resource_names["prometheus_endpoint"].standard

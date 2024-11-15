@@ -281,6 +281,12 @@ variable "enable_prometheus_monitoring" {
   default     = true
 }
 
+variable "enable_prometheus_monitoring_private_endpoint" {
+  description = "Enable private endpoint for Prometheus monitoring"
+  type        = bool
+  default     = false
+}
+
 variable "prometheus_workspace_public_access_enabled" {
   description = "Enable public access to the Azure Monitor workspace for prometheus"
   type        = bool

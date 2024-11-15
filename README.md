@@ -156,32 +156,31 @@ If `make check` target is successful, developer is good to commit the code to pr
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.67 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.117 |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.116.0 |
+No providers.
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 1.0 |
+| <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 2.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.0 |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | terraform.registry.launch.nttdata.com/module_primitive/key_vault/azurerm | ~> 1.0 |
 | <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_cluster_identity"></a> [cluster\_identity](#module\_cluster\_identity) | terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm | ~> 1.0 |
+| <a name="module_cluster_identity_roles"></a> [cluster\_identity\_roles](#module\_cluster\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_private_cluster_dns_zone"></a> [private\_cluster\_dns\_zone](#module\_private\_cluster\_dns\_zone) | terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm | ~> 1.0 |
+| <a name="module_cluster_identity_private_dns_contributor"></a> [cluster\_identity\_private\_dns\_contributor](#module\_cluster\_identity\_private\_dns\_contributor) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_vnet_links"></a> [vnet\_links](#module\_vnet\_links) | terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm | ~> 1.0 |
 | <a name="module_route_table"></a> [route\_table](#module\_route\_table) | terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm | ~> 1.0 |
 | <a name="module_udr_route_table_role_assignment"></a> [udr\_route\_table\_role\_assignment](#module\_udr\_route\_table\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_routes"></a> [routes](#module\_routes) | terraform.registry.launch.nttdata.com/module_primitive/route/azurerm | ~> 1.0 |
 | <a name="module_subnet_route_table_assoc"></a> [subnet\_route\_table\_assoc](#module\_subnet\_route\_table\_assoc) | terraform.registry.launch.nttdata.com/module_primitive/routetable_subnet_association/azurerm | ~> 1.0 |
 | <a name="module_aks"></a> [aks](#module\_aks) | terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm | ~> 2.0 |
-| <a name="module_cluster_identity_roles"></a> [cluster\_identity\_roles](#module\_cluster\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | terraform.registry.launch.nttdata.com/module_primitive/application_insights/azurerm | ~> 1.0 |
@@ -198,9 +197,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+No resources.
 
 ## Inputs
 
@@ -335,6 +332,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="input_enable_prometheus_monitoring"></a> [enable\_prometheus\_monitoring](#input\_enable\_prometheus\_monitoring) | Deploy Prometheus monitoring resources with the AKS cluster | `bool` | `false` | no |
 | <a name="input_brown_field_prometheus_monitor_workspace_id"></a> [brown\_field\_prometheus\_monitor\_workspace\_id](#input\_brown\_field\_prometheus\_monitor\_workspace\_id) | The ID of an existing Azure Monitor workspace to use for Prometheus monitoring | `string` | `null` | no |
 | <a name="input_prometheus_workspace_public_access_enabled"></a> [prometheus\_workspace\_public\_access\_enabled](#input\_prometheus\_workspace\_public\_access\_enabled) | Enable public access to the Azure Monitor workspace for prometheus | `bool` | `true` | no |
+| <a name="input_enable_prometheus_monitoring_private_endpoint"></a> [enable\_prometheus\_monitoring\_private\_endpoint](#input\_enable\_prometheus\_monitoring\_private\_endpoint) | Enable private endpoint for Prometheus monitoring | `bool` | `false` | no |
 | <a name="input_prometheus_monitoring_private_endpoint_subnet_id"></a> [prometheus\_monitoring\_private\_endpoint\_subnet\_id](#input\_prometheus\_monitoring\_private\_endpoint\_subnet\_id) | The ID of a subnet to create a private endpoint for Prometheus monitoring | `string` | `null` | no |
 | <a name="input_prometheus_enable_default_rule_groups"></a> [prometheus\_enable\_default\_rule\_groups](#input\_prometheus\_enable\_default\_rule\_groups) | Enable default recording rules for prometheus | `bool` | `true` | no |
 | <a name="input_prometheus_default_rule_group_naming"></a> [prometheus\_default\_rule\_group\_naming](#input\_prometheus\_default\_rule\_group\_naming) | Resource names for the default recording rules | `map(string)` | <pre>{<br>  "kubernetes_recording": "DefaultKubernetesRecordingRuleGroup",<br>  "node_recording": "DefaultNodeRecordingRuleGroup"<br>}</pre> | no |

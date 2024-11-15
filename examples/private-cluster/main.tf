@@ -104,6 +104,10 @@ module "aks" {
   secret_rotation_enabled            = var.secret_rotation_enabled
   secret_rotation_interval           = var.secret_rotation_interval
 
+  cluster_identity_role_assignments = {
+    "vnet" = ["Network Contributor", module.vnet.vnet_id]
+  }
+
   node_pools = {
     apppool1 = {
       name       = "apppool1"
