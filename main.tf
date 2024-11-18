@@ -416,6 +416,8 @@ module "prometheus_monitor_workspace" {
   public_network_access_enabled = var.prometheus_workspace_public_access_enabled
 
   tags = merge(var.tags, { resource_name = module.resource_names["prometheus_monitor_workspace"].standard })
+
+  depends_on = [module.resource_group]
 }
 
 module "prometheus_monitor_data_collection" {
@@ -438,6 +440,8 @@ module "prometheus_monitor_data_collection" {
 
   data_collection_endpoint_name = module.resource_names["prometheus_data_collection_endpoint"].standard
   data_collection_rule_name     = module.resource_names["prometheus_data_collection_rule"].standard
+
+  depends_on = [module.resource_group, module.aks, module.prometheus_monitor_workspace]
 }
 
 module "prometheus_monitor_workspace_private_dns_zone" {
