@@ -222,7 +222,7 @@ module "aks" {
 
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                        = var.region
-  prefix                          = module.resource_names["aks"].dns_compliant_minimal
+  prefix                          = var.use_standard_aks_resource_name ? module.resource_names["aks"].standard : module.resource_names["aks"].dns_compliant_minimal
   network_plugin                  = var.network_plugin
   network_plugin_mode             = var.network_plugin_mode
   network_policy                  = var.network_policy
@@ -230,7 +230,7 @@ module "aks" {
   identity_type                   = var.identity_type
   identity_ids                    = var.identity_type == "UserAssigned" ? concat([module.cluster_identity[0].id], var.identity_ids) : null
   kubernetes_version              = var.kubernetes_version
-  cluster_name                    = module.resource_names["aks"].dns_compliant_minimal
+  cluster_name                    = var.use_standard_aks_resource_name ? module.resource_names["aks"].standard : module.resource_names["aks"].dns_compliant_minimal
   api_server_subnet_id            = var.api_server_subnet_id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   azure_policy_enabled            = var.azure_policy_enabled

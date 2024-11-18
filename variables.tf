@@ -128,6 +128,12 @@ variable "resource_names_map" {
   }
 }
 
+variable "use_standard_aks_resource_name" {
+  description = "Use the standard resource name for AKS. defaults to false (minimal DNS compliant name)"
+  type        = bool
+  default     = false
+}
+
 variable "resource_group_name" {
   description = "Name of the resource group in which the AKS cluster will be created. If not provided, this module will create one"
   type        = string
