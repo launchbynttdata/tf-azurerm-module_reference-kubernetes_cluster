@@ -1024,6 +1024,12 @@ variable "create_key_vault" {
   default     = false
 }
 
+variable "key_vault_name" {
+  description = "The name of the key vault to override the naming module"
+  type        = string
+  default     = null
+}
+
 variable "key_vault_role_definition" {
   description = "Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator`"
   type        = string
