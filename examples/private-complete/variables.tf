@@ -89,6 +89,12 @@ variable "subnet_prefixes" {
   default     = ["10.50.0.0/24", "10.50.1.0/24", "10.50.2.0/24", "10.50.3.0/24", "10.50.4.0/24"]
 }
 
+variable "time_to_wait_after_destroy" {
+  description = "time to wait before destroying the virtual network"
+  type        = string
+  default     = "30s"
+}
+
 variable "kubernetes_version" {
   type        = string
   default     = "1.27"

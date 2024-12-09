@@ -50,7 +50,7 @@ module "key_vault" {
     name     = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
     location = var.region
   }
-  key_vault_name             = module.resource_names["key_vault"].minimal
+  key_vault_name             = var.key_vault_name != null ? var.key_vault_name : module.resource_names["key_vault"].minimal
   enable_rbac_authorization  = var.enable_rbac_authorization
   soft_delete_retention_days = var.kv_soft_delete_retention_days
   sku_name                   = var.kv_sku
