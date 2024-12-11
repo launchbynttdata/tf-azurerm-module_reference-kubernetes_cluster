@@ -76,6 +76,13 @@ module "vnet" {
   depends_on = [module.resource_group]
 }
 
+# wait some time before cleaning up the vnet
+resource "time_sleep" "wait_after_destroy" {
+  destroy_duration = var.time_to_wait_after_destroy
+
+  depends_on = [module.vnet]
+}
+
 module "aks" {
   source = "../.."
 
@@ -163,5 +170,5 @@ module "aks" {
 
   tags = var.tags
 
-  depends_on = [module.vnet]
+  depends_on = [module.vnet, time_sleep.wait_after_destroy]
 }
