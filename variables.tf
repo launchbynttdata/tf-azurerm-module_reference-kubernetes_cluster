@@ -89,6 +89,10 @@ variable "resource_names_map" {
       name       = "rt"
       max_length = 60
     }
+    public_dns_zone = {
+      name       = "dns"
+      max_length = 60
+    }
     application_insights = {
       name       = "appins"
       max_length = 60
@@ -1167,6 +1171,13 @@ variable "container_registry_ids" {
   description = "List of container registry IDs to associate with AKS. This module will assign role `AcrPull` to AKS for these registries"
   type        = list(string)
   default     = []
+}
+
+## DNS zone related variables
+variable "public_dns_zone_name" {
+  description = "Name of a public DNS zone to create with the kubernetes cluster"
+  type        = string
+  default     = null
 }
 
 ## Key Vault related variables

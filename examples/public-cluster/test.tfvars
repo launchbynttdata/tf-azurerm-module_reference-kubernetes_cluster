@@ -30,4 +30,6 @@ node_pools = {
   }
 }
 
+public_dns_zone_name = "terratest.example-1.com"
+
 log_analytics_workspace_daily_quota_gb = 5

@@ -289,6 +289,13 @@ variable "node_pools" {
   nullable    = false
 }
 
+## DNS zone related variables
+variable "public_dns_zone_name" {
+  description = "Name of a public DNS zone to create with the kubernetes cluster"
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "A map of custom tags to be attached to this module resources"
   type        = map(string)
