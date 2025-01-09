@@ -83,6 +83,17 @@ variable "log_analytics_workspace_daily_quota_gb" {
   description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to -1 (unlimited) if omitted."
 }
 
+variable "identity_type" {
+  type        = string
+  default     = "SystemAssigned"
+  description = "(Optional) The type of identity used for the managed cluster. Conflicts with `client_id` and `client_secret`. Possible values are `SystemAssigned` and `UserAssigned`. If `UserAssigned` is set, an `identity_ids` must be set as well."
+
+  validation {
+    condition     = var.identity_type == "SystemAssigned" || var.identity_type == "UserAssigned"
+    error_message = "`identity_type`'s possible values are `SystemAssigned` and `UserAssigned`"
+  }
+}
+
 variable "node_pools" {
   type = map(object({
     name                          = string

@@ -13,6 +13,8 @@ product_family  = "dso"
 product_service = "kube"
 agents_size     = "Standard_D2_v2"
 
+identity_type = "UserAssigned"
+
 node_pools = {
   apppool1 = {
     name       = "apppool1"

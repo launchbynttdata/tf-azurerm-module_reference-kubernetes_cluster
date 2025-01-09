@@ -184,6 +184,7 @@ No providers.
 | <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_public_dns_zone"></a> [public\_dns\_zone](#module\_public\_dns\_zone) | terraform.registry.launch.nttdata.com/module_primitive/dns_zone/azurerm | ~> 1.0 |
+| <a name="module_cluster_identity_public_dns_contributor"></a> [cluster\_identity\_public\_dns\_contributor](#module\_cluster\_identity\_public\_dns\_contributor) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | terraform.registry.launch.nttdata.com/module_primitive/application_insights/azurerm | ~> 1.0 |
 | <a name="module_prometheus_monitor_workspace"></a> [prometheus\_monitor\_workspace](#module\_prometheus\_monitor\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/monitor_workspace/azurerm | ~> 1.0 |
 | <a name="module_prometheus_monitor_data_collection"></a> [prometheus\_monitor\_data\_collection](#module\_prometheus\_monitor\_data\_collection) | terraform.registry.launch.nttdata.com/module_primitive/monitor_prometheus/azurerm | ~> 1.0 |

@@ -25,6 +25,8 @@ module "aks" {
   environment_number = var.environment_number
   region             = var.region
 
+  identity_type = var.identity_type
+
   node_pools = var.node_pools
 
   kubernetes_version = var.kubernetes_version
