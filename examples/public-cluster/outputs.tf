@@ -55,3 +55,13 @@ output "node_resource_group" {
   description = "The RG of the default node pool"
   value       = module.aks.node_resource_group
 }
+
+output "public_dns_zone_id" {
+  description = "Id of the public DNS zone created with the cluster"
+  value       = module.aks.public_dns_zone_id
+}
+
+output "public_dns_zone_name_servers" {
+  description = "Name of the public DNS zone created with the cluster"
+  value       = module.aks.public_dns_zone_name_servers
+}

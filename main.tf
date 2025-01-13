@@ -377,6 +377,33 @@ module "additional_acr_role_assignments" {
   scope                = each.key
 }
 
+module "public_dns_zone" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/dns_zone/azurerm"
+  version = "~> 1.0"
+
+  count = var.public_dns_zone_name != null ? 1 : 0
+
+  domain_names        = [var.public_dns_zone_name]
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  resource_name_tag   = module.resource_names["public_dns_zone"].standard
+  tags                = local.tags
+
+  depends_on = [module.resource_group]
+}
+
+module "cluster_identity_public_dns_contributor" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  count = (var.identity_type == "UserAssigned" && var.public_dns_zone_name != null) ? 1 : 0
+
+  principal_id         = module.cluster_identity[0].principal_id
+  role_definition_name = "DNS Zone Contributor"
+  scope                = module.public_dns_zone[0].ids[0]
+
+  depends_on = [module.cluster_identity, module.public_dns_zone]
+}
+
 module "application_insights" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/application_insights/azurerm"
   version = "~> 1.0"

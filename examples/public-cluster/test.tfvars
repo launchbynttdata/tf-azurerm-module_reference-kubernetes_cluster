@@ -13,6 +13,8 @@ product_family  = "dso"
 product_service = "kube"
 agents_size     = "Standard_D2_v2"
 
+identity_type = "UserAssigned"
+
 node_pools = {
   apppool1 = {
     name       = "apppool1"
@@ -29,5 +31,7 @@ node_pools = {
     os_type = "Linux"
   }
 }
+
+public_dns_zone_name = "terratest.example-1.com"
 
 log_analytics_workspace_daily_quota_gb = 5

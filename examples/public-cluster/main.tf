@@ -25,6 +25,8 @@ module "aks" {
   environment_number = var.environment_number
   region             = var.region
 
+  identity_type = var.identity_type
+
   node_pools = var.node_pools
 
   kubernetes_version = var.kubernetes_version
@@ -35,6 +37,8 @@ module "aks" {
 
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
+
+  public_dns_zone_name = var.public_dns_zone_name
 
   log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 
