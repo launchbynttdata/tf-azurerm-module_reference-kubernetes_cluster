@@ -391,17 +391,30 @@ module "public_dns_zone" {
   depends_on = [module.resource_group]
 }
 
-module "cluster_identity_public_dns_contributor" {
+module "kubelet_public_dns_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
-  count = (var.identity_type == "UserAssigned" && var.public_dns_zone_name != null) ? 1 : 0
+  count = var.public_dns_zone_name != null ? 1 : 0
 
-  principal_id         = module.cluster_identity[0].principal_id
+  principal_id         = module.aks.kubelet_identity[0].object_id
   role_definition_name = "DNS Zone Contributor"
   scope                = module.public_dns_zone[0].ids[0]
 
-  depends_on = [module.cluster_identity, module.public_dns_zone]
+  depends_on = [module.aks, module.public_dns_zone]
+}
+
+module "kubelet_resource_group_reader" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  count = (var.public_dns_zone_name != null && length(module.resource_group) > 0) ? 1 : 0
+
+  principal_id         = module.aks.kubelet_identity[0].object_id
+  role_definition_name = "Reader"
+  scope                = module.resource_group[0].id
+
+  depends_on = [module.aks, module.public_dns_zone]
 }
 
 module "application_insights" {
