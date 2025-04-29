@@ -281,6 +281,8 @@ module "aks" {
   agents_max_pods              = var.agents_max_pods
   agents_pool_linux_os_configs = var.agents_pool_linux_os_configs
 
+  temporary_name_for_rotation = var.temporary_name_for_rotation
+
   os_disk_size_gb = var.os_disk_size_gb
   os_disk_type    = var.os_disk_type
   os_sku          = var.os_sku

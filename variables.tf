@@ -413,6 +413,12 @@ variable "agents_size" {
   description = "The default virtual machine size for the Kubernetes agents. Changing this without specifying `var.temporary_name_for_rotation` forces a new resource to be created."
 }
 
+variable "temporary_name_for_rotation" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies the name of the temporary node pool used to cycle the default node pool for VM resizing. the `var.agents_size` is no longer ForceNew and can be resized by specifying `temporary_name_for_rotation`"
+}
+
 variable "agents_tags" {
   type        = map(string)
   default     = {}
