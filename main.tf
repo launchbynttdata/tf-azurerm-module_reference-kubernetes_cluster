@@ -434,7 +434,7 @@ module "application_insights" {
   daily_data_cap_notifications_disabled = var.application_insights.daily_data_cap_notifications_disabled
   sampling_percentage                   = var.application_insights.sampling_percentage
   disable_ip_masking                    = var.application_insights.disabling_ip_masking
-  workspace_id                          = module.aks.azurerm_log_analytics_workspace_id
+  workspace_id                          = var.log_analytics_workspace != null ? var.log_analytics_workspace.id : module.aks.azurerm_log_analytics_workspace_id
   local_authentication_disabled         = var.application_insights.local_authentication_disabled
   internet_ingestion_enabled            = var.application_insights.internet_ingestion_enabled
   internet_query_enabled                = var.application_insights.internet_query_enabled

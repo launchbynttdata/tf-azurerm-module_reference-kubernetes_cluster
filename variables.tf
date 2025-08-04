@@ -142,7 +142,7 @@ variable "resource_group_name" {
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.28"
+  default     = "1.32"
   description = <<EOT
     Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region
     Use `az aks get-versions --location <region>` to find the available versions in the region
