@@ -1,7 +1,7 @@
 product_family  = "dso"
 product_service = "pvt"
 
-kubernetes_version        = "1.28"
+kubernetes_version        = "1.32"
 agents_count              = 2
 agents_availability_zones = [1, 2]
 # default service cidr is 10.0.0.0/16
