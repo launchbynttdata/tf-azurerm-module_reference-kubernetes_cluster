@@ -1,6 +1,6 @@
 module github.com/launchbynttdata/tf-azurerm-module_reference-kubernetes_cluster
 
-go 1.21
+go 1.24
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.1
