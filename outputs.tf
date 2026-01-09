@@ -274,3 +274,21 @@ output "prometheus_data_collection_rule_id" {
   description = "Resource ID of the Prometheus Monitor data collection rule"
   value       = length(module.prometheus_monitor_data_collection) > 0 ? module.prometheus_monitor_data_collection[0].data_collection_rule_id : null
 }
+
+output "workload_user_assigned_identities" {
+  value = {
+    for key, mod in module.workload_user_assigned_identities :
+    key => {
+      id           = mod.id
+      client_id    = mod.client_id
+      principal_id = mod.principal_id
+    }
+  }
+}
+
+output "workload_federated_identity_credentials" {
+  value = {
+    for key, mod in module.workload_federated_identity_credentials :
+    key => mod.id
+  }
+}

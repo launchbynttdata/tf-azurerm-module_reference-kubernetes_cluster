@@ -106,6 +106,53 @@ module "cluster_identity" {
   depends_on = [module.resource_group]
 }
 
+module "workload_user_assigned_identities" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.workload_user_assigned_identities
+
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location            = coalesce(each.value.location, var.region)
+
+  # Clean UAI naming
+  user_assigned_identity_name = coalesce(
+    each.value.name_override,
+    "${module.resource_names["aks"].dns_compliant_minimal}-uai-${each.key}"
+  )
+
+  depends_on = [module.resource_group]
+}
+
+module "workload_federated_identity_credentials" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/federated_identity_credential/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.workload_federated_credentials
+
+  name                = each.value.name
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  # Must be list(string)
+  audience = each.value.audience
+
+  # OIDC issuer (safe lookup in case OIDC disabled)
+  issuer = try(module.aks.oidc_issuer_url, null)
+
+  # Link FIC → UAI
+  user_assigned_identity_id = module.workload_user_assigned_identities[
+    each.value.user_assigned_identity_key
+  ].id
+
+  # Workload Identity subject
+  subject = "system:serviceaccount:${each.value.namespace}:${each.value.service_account_name}"
+
+  depends_on = [
+    module.aks,
+    module.workload_user_assigned_identities
+  ]
+}
+
 module "cluster_identity_roles" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"

@@ -390,3 +390,26 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+# variable "workload_user_assigned_identities" {
+#   description = "Map of additional user-assigned identities for workloads."
+#   type = map(object({
+#     name_override = optional(string)
+#     location      = optional(string)
+#   }))
+#   default = {}
+# }
+
+# variable "workload_federated_credentials" {
+#   description = "Map of federated identity credentials to attach to workload identities."
+#   type = map(object({
+#     user_assigned_identity_key = string
+#     name                       = string
+
+#     namespace            = string
+#     service_account_name = string
+
+#     audience = optional(list(string), ["api://AzureADTokenExchange"])
+#   }))
+#   default = {}
+# }

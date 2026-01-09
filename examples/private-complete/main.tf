@@ -171,4 +171,27 @@ module "aks" {
   tags = var.tags
 
   depends_on = [module.vnet, time_sleep.wait_after_destroy]
+  # Required for workload identity / federated credentials
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
+  workload_user_assigned_identities = {
+    testidentity = {
+      name_override = "${try(
+        module.resource_names["aks"].dns_compliant_minimal,
+        "aks-fallback"
+      )}-uai-test"
+    }
+  }
+  workload_federated_credentials = {
+    testcred = {
+      user_assigned_identity_key = "testidentity"
+      name                       = "aks-test-workload-fic"
+
+      namespace            = "default"
+      service_account_name = "test-app"
+
+      # Optional: audience list
+      audience = ["api://AzureADTokenExchange"]
+    }
+  }
 }
