@@ -159,7 +159,7 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 3. [Kubenet with BYO subnet and route table](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet#bring-your-own-subnet-and-route-table-with-kubenet)
 4. [Required Service Tags for Outbound traffic](https://learn.microsoft.com/en-us/azure/aks/outbound-rules-control-egress#azure-global-required-network-rules)
 # Terraform Details
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -174,8 +174,8 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 
 | Name | Version |
 |------|---------|
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
-| <a name="provider_time"></a> [time](#provider\_time) | 0.12.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+| <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
 
 ## Modules
 
@@ -263,7 +263,7 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 | <a name="output_cluster_identity"></a> [cluster\_identity](#output\_cluster\_identity) | n/a |
 | <a name="output_kubelet_identity"></a> [kubelet\_identity](#output\_kubelet\_identity) | The `azurerm_kubernetes_cluster`'s `kubelet_identity` block. |
 | <a name="output_node_resource_group"></a> [node\_resource\_group](#output\_node\_resource\_group) | The auto-generated Resource Group which contains the resources for this Managed Kubernetes Cluster. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 # References
 1. [Private ACR Integration](https://techcommunity.microsoft.com/t5/core-infrastructure-and-security/private-aks-and-acr-using-private-endpoint-part-2-2/ba-p/3122281)

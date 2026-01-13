@@ -1439,3 +1439,44 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+variable "workload_user_assigned_identities" {
+  description = "Map of additional user-assigned identities for workloads."
+  type = map(object({
+    name_override = optional(string)
+    location      = optional(string)
+  }))
+  default = {}
+}
+
+variable "workload_federated_credentials" {
+  description = <<-EOT
+    Map of federated identity credentials that allow AKS workloads
+    (Kubernetes ServiceAccounts) to assume Azure user-assigned
+    managed identities using OIDC (Workload Identity).
+  EOT
+
+  type = map(object({
+    # Key referencing workload_user_assigned_identities
+    user_assigned_identity_key = string
+
+    # Name of the federated identity credential resource
+    name = string
+
+    # Kubernetes ServiceAccount details
+    namespace            = string
+    service_account_name = string
+
+    # Audience for the federated credential
+    audience = optional(list(string), ["api://AzureADTokenExchange"])
+  }))
+
+  default = {}
+
+  # Optional: simple validation only on this variable's structure
+  validation {
+    condition = alltrue([
+      for _, fic in var.workload_federated_credentials : length(fic.name) > 0
+    ])
+    error_message = "Each workload_federated_credentials entry must have a non-empty 'name'."
+  }
+}
