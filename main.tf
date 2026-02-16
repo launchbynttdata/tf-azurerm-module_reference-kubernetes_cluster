@@ -50,7 +50,7 @@ module "key_vault" {
     name     = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
     location = var.region
   }
-  key_vault_name             = module.resource_names["key_vault"].minimal
+  key_vault_name             = var.key_vault_name != null ? var.key_vault_name : module.resource_names["key_vault"].minimal
   enable_rbac_authorization  = var.enable_rbac_authorization
   soft_delete_retention_days = var.kv_soft_delete_retention_days
   sku_name                   = var.kv_sku
@@ -104,6 +104,53 @@ module "cluster_identity" {
   user_assigned_identity_name = module.resource_names["cluster_identity"].standard
 
   depends_on = [module.resource_group]
+}
+
+module "workload_user_assigned_identities" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.workload_user_assigned_identities
+
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location            = coalesce(each.value.location, var.region)
+
+  # Clean UAI naming
+  user_assigned_identity_name = coalesce(
+    each.value.name_override,
+    "${module.resource_names["aks"].dns_compliant_minimal}-uai-${each.key}"
+  )
+
+  depends_on = [module.resource_group]
+}
+
+module "workload_federated_identity_credentials" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/federated_identity_credential/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.workload_federated_credentials
+
+  name                = each.value.name
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+
+  # Must be list(string)
+  audience = each.value.audience
+
+  # OIDC issuer (safe lookup in case OIDC disabled)
+  issuer = try(module.aks.oidc_issuer_url, null)
+
+  # Link FIC → UAI
+  user_assigned_identity_id = module.workload_user_assigned_identities[
+    each.value.user_assigned_identity_key
+  ].id
+
+  # Workload Identity subject
+  subject = "system:serviceaccount:${each.value.namespace}:${each.value.service_account_name}"
+
+  depends_on = [
+    module.aks,
+    module.workload_user_assigned_identities
+  ]
 }
 
 module "cluster_identity_roles" {
@@ -281,6 +328,8 @@ module "aks" {
   agents_max_pods              = var.agents_max_pods
   agents_pool_linux_os_configs = var.agents_pool_linux_os_configs
 
+  temporary_name_for_rotation = var.temporary_name_for_rotation
+
   os_disk_size_gb = var.os_disk_size_gb
   os_disk_type    = var.os_disk_type
   os_sku          = var.os_sku
@@ -377,6 +426,46 @@ module "additional_acr_role_assignments" {
   scope                = each.key
 }
 
+module "public_dns_zone" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/dns_zone/azurerm"
+  version = "~> 1.0"
+
+  count = var.public_dns_zone_name != null ? 1 : 0
+
+  domain_names        = [var.public_dns_zone_name]
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  resource_name_tag   = module.resource_names["public_dns_zone"].standard
+  tags                = local.tags
+
+  depends_on = [module.resource_group]
+}
+
+module "kubelet_public_dns_contributor" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  count = var.public_dns_zone_name != null ? 1 : 0
+
+  principal_id         = module.aks.kubelet_identity[0].object_id
+  role_definition_name = "DNS Zone Contributor"
+  scope                = module.public_dns_zone[0].ids[0]
+
+  depends_on = [module.aks, module.public_dns_zone]
+}
+
+module "kubelet_resource_group_reader" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  count = (var.public_dns_zone_name != null && length(module.resource_group) > 0) ? 1 : 0
+
+  principal_id         = module.aks.kubelet_identity[0].object_id
+  role_definition_name = "Reader"
+  scope                = module.resource_group[0].id
+
+  depends_on = [module.aks, module.public_dns_zone]
+}
+
 module "application_insights" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/application_insights/azurerm"
   version = "~> 1.0"
@@ -392,7 +481,7 @@ module "application_insights" {
   daily_data_cap_notifications_disabled = var.application_insights.daily_data_cap_notifications_disabled
   sampling_percentage                   = var.application_insights.sampling_percentage
   disable_ip_masking                    = var.application_insights.disabling_ip_masking
-  workspace_id                          = module.aks.azurerm_log_analytics_workspace_id
+  workspace_id                          = var.log_analytics_workspace != null ? var.log_analytics_workspace.id : module.aks.azurerm_log_analytics_workspace_id
   local_authentication_disabled         = var.application_insights.local_authentication_disabled
   internet_ingestion_enabled            = var.application_insights.internet_ingestion_enabled
   internet_query_enabled                = var.application_insights.internet_query_enabled

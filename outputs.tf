@@ -205,6 +205,16 @@ output "private_cluster_dns_zone_name" {
   value       = try(module.private_cluster_dns_zone[0].zone_name, "")
 }
 
+output "public_dns_zone_id" {
+  description = "Id of the public DNS zone created with the cluster"
+  value       = try(module.public_dns_zone[0].ids[0], "")
+}
+
+output "public_dns_zone_name_servers" {
+  description = "Name of the public DNS zone created with the cluster"
+  value       = try(module.public_dns_zone[0].name_servers[0], "")
+}
+
 output "user_assigned_msi_object_id" {
   description = "The object ID of the user assigned managed identity."
   value       = try(module.cluster_identity[0].principal_id, "")
@@ -263,4 +273,22 @@ output "prometheus_data_collection_endpoint_id" {
 output "prometheus_data_collection_rule_id" {
   description = "Resource ID of the Prometheus Monitor data collection rule"
   value       = length(module.prometheus_monitor_data_collection) > 0 ? module.prometheus_monitor_data_collection[0].data_collection_rule_id : null
+}
+
+output "workload_user_assigned_identities" {
+  value = {
+    for key, mod in module.workload_user_assigned_identities :
+    key => {
+      id           = mod.id
+      client_id    = mod.client_id
+      principal_id = mod.principal_id
+    }
+  }
+}
+
+output "workload_federated_identity_credentials" {
+  value = {
+    for key, mod in module.workload_federated_identity_credentials :
+    key => mod.id
+  }
 }
