@@ -159,21 +159,23 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 3. [Kubenet with BYO subnet and route table](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet#bring-your-own-subnet-and-route-table-with-kubenet)
 4. [Required Service Tags for Outbound traffic](https://learn.microsoft.com/en-us/azure/aks/outbound-rules-control-egress#azure-global-required-network-rules)
 # Terraform Details
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.67 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.117 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.5 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.12 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+| <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
 
 ## Modules
 
@@ -190,6 +192,7 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 |------|------|
 | [random_integer.random_int](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) | resource |
 | [random_password.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [time_sleep.wait_after_destroy](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 
 ## Inputs
 
@@ -204,6 +207,7 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 | <a name="input_address_space"></a> [address\_space](#input\_address\_space) | Address space of the Vnet | `list(string)` | <pre>[<br>  "10.50.0.0/16"<br>]</pre> | no |
 | <a name="input_subnet_names"></a> [subnet\_names](#input\_subnet\_names) | Name of the subnets to be created | `list(string)` | <pre>[<br>  "subnet-api-server",<br>  "subnet-default-pool",<br>  "subnet-app-pool-1",<br>  "subnet-private-aks",<br>  "subnet-private-endpoint"<br>]</pre> | no |
 | <a name="input_subnet_prefixes"></a> [subnet\_prefixes](#input\_subnet\_prefixes) | The CIDR blocks of the subnets whose names are specified in `subnet_names` | `list(string)` | <pre>[<br>  "10.50.0.0/24",<br>  "10.50.1.0/24",<br>  "10.50.2.0/24",<br>  "10.50.3.0/24",<br>  "10.50.4.0/24"<br>]</pre> | no |
+| <a name="input_time_to_wait_after_destroy"></a> [time\_to\_wait\_after\_destroy](#input\_time\_to\_wait\_after\_destroy) | time to wait before destroying the virtual network | `string` | `"30s"` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region | `string` | `"1.27"` | no |
 | <a name="input_network_plugin"></a> [network\_plugin](#input\_network\_plugin) | Network plugin to use for networking. Default is azure. | `string` | `"azure"` | no |
 | <a name="input_monitor_metrics"></a> [monitor\_metrics](#input\_monitor\_metrics) | (Optional) Specifies a Prometheus add-on profile for the Kubernetes Cluster<br>object({<br>  annotations\_allowed = "(Optional) Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric."<br>  labels\_allowed      = "(Optional) Specifies a Comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric."<br>}) | <pre>object({<br>    annotations_allowed = optional(string)<br>    labels_allowed      = optional(string)<br>  })</pre> | `{}` | no |
@@ -228,6 +232,7 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 | <a name="input_create_monitor_private_link_scope"></a> [create\_monitor\_private\_link\_scope](#input\_create\_monitor\_private\_link\_scope) | If true, create a new Private Link Scope for Azure Monitor.<br>    NOTE: This will cause all azure monitor / log analytics traffic to go through private link. | `bool` | `true` | no |
 | <a name="input_monitor_private_link_scope_dns_zone_suffixes"></a> [monitor\_private\_link\_scope\_dns\_zone\_suffixes](#input\_monitor\_private\_link\_scope\_dns\_zone\_suffixes) | The DNS zone suffixes for the private link scope | `set(string)` | <pre>[<br>  "privatelink.monitor.azure.com",<br>  "privatelink.oms.opinsights.azure.com",<br>  "privatelink.ods.opinsights.azure.com",<br>  "privatelink.agentsvc.azure-automation.net",<br>  "privatelink.blob.core.windows.net"<br>]</pre> | no |
 | <a name="input_enable_prometheus_monitoring"></a> [enable\_prometheus\_monitoring](#input\_enable\_prometheus\_monitoring) | Deploy Prometheus monitoring resources with the AKS cluster | `bool` | `true` | no |
+| <a name="input_enable_prometheus_monitoring_private_endpoint"></a> [enable\_prometheus\_monitoring\_private\_endpoint](#input\_enable\_prometheus\_monitoring\_private\_endpoint) | Enable private endpoint for Prometheus monitoring | `bool` | `false` | no |
 | <a name="input_prometheus_workspace_public_access_enabled"></a> [prometheus\_workspace\_public\_access\_enabled](#input\_prometheus\_workspace\_public\_access\_enabled) | Enable public access to the Azure Monitor workspace for prometheus | `bool` | `true` | no |
 | <a name="input_prometheus_enable_default_rule_groups"></a> [prometheus\_enable\_default\_rule\_groups](#input\_prometheus\_enable\_default\_rule\_groups) | Enable default recording rules for prometheus | `bool` | `true` | no |
 | <a name="input_prometheus_default_rule_group_naming"></a> [prometheus\_default\_rule\_group\_naming](#input\_prometheus\_default\_rule\_group\_naming) | Resource names for the default recording rules | `map(string)` | <pre>{<br>  "kubernetes_recording": "DefaultKubernetesRecordingRuleGroup",<br>  "node_recording": "DefaultNodeRecordingRuleGroup"<br>}</pre> | no |
@@ -258,7 +263,7 @@ In case of peered Vnet, the VNet must be linked with the Private DNS Zone of the
 | <a name="output_cluster_identity"></a> [cluster\_identity](#output\_cluster\_identity) | n/a |
 | <a name="output_kubelet_identity"></a> [kubelet\_identity](#output\_kubelet\_identity) | The `azurerm_kubernetes_cluster`'s `kubelet_identity` block. |
 | <a name="output_node_resource_group"></a> [node\_resource\_group](#output\_node\_resource\_group) | The auto-generated Resource Group which contains the resources for this Managed Kubernetes Cluster. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 # References
 1. [Private ACR Integration](https://techcommunity.microsoft.com/t5/core-infrastructure-and-security/private-aks-and-acr-using-private-endpoint-part-2-2/ba-p/3122281)

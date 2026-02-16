@@ -76,6 +76,13 @@ module "vnet" {
   depends_on = [module.resource_group]
 }
 
+# wait some time before cleaning up the vnet
+resource "time_sleep" "wait_after_destroy" {
+  destroy_duration = var.time_to_wait_after_destroy
+
+  depends_on = [module.vnet]
+}
+
 module "aks" {
   source = "../.."
 
@@ -103,6 +110,10 @@ module "aks" {
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   secret_rotation_enabled            = var.secret_rotation_enabled
   secret_rotation_interval           = var.secret_rotation_interval
+
+  cluster_identity_role_assignments = {
+    "vnet" = ["Network Contributor", module.vnet.vnet_id]
+  }
 
   node_pools = {
     apppool1 = {
@@ -139,6 +150,5 @@ module "aks" {
 
   tags = var.tags
 
-  depends_on = [module.vnet]
-
+  depends_on = [module.vnet, time_sleep.wait_after_destroy]
 }

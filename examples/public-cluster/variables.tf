@@ -48,7 +48,7 @@ variable "region" {
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.28"
+  default     = "1.32"
   description = "Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region"
 }
 
@@ -81,6 +81,17 @@ variable "log_analytics_workspace_daily_quota_gb" {
   type        = number
   default     = null
   description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to -1 (unlimited) if omitted."
+}
+
+variable "identity_type" {
+  type        = string
+  default     = "SystemAssigned"
+  description = "(Optional) The type of identity used for the managed cluster. Conflicts with `client_id` and `client_secret`. Possible values are `SystemAssigned` and `UserAssigned`. If `UserAssigned` is set, an `identity_ids` must be set as well."
+
+  validation {
+    condition     = var.identity_type == "SystemAssigned" || var.identity_type == "UserAssigned"
+    error_message = "`identity_type`'s possible values are `SystemAssigned` and `UserAssigned`"
+  }
 }
 
 variable "node_pools" {
@@ -287,6 +298,13 @@ variable "node_pools" {
   }))
   EOT
   nullable    = false
+}
+
+## DNS zone related variables
+variable "public_dns_zone_name" {
+  description = "Name of a public DNS zone to create with the kubernetes cluster"
+  type        = string
+  default     = null
 }
 
 variable "tags" {

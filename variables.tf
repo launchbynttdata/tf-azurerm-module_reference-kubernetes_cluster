@@ -89,6 +89,10 @@ variable "resource_names_map" {
       name       = "rt"
       max_length = 60
     }
+    public_dns_zone = {
+      name       = "dns"
+      max_length = 60
+    }
     application_insights = {
       name       = "appins"
       max_length = 60
@@ -138,7 +142,7 @@ variable "resource_group_name" {
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.28"
+  default     = "1.32"
   description = <<EOT
     Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region
     Use `az aks get-versions --location <region>` to find the available versions in the region
@@ -407,6 +411,12 @@ variable "agents_size" {
   type        = string
   default     = "Standard_D2_v2"
   description = "The default virtual machine size for the Kubernetes agents. Changing this without specifying `var.temporary_name_for_rotation` forces a new resource to be created."
+}
+
+variable "temporary_name_for_rotation" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies the name of the temporary node pool used to cycle the default node pool for VM resizing. the `var.agents_size` is no longer ForceNew and can be resized by specifying `temporary_name_for_rotation`"
 }
 
 variable "agents_tags" {
@@ -1024,6 +1034,12 @@ variable "create_key_vault" {
   default     = false
 }
 
+variable "key_vault_name" {
+  description = "The name of the key vault to override the naming module"
+  type        = string
+  default     = null
+}
+
 variable "key_vault_role_definition" {
   description = "Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator`"
   type        = string
@@ -1161,6 +1177,13 @@ variable "container_registry_ids" {
   description = "List of container registry IDs to associate with AKS. This module will assign role `AcrPull` to AKS for these registries"
   type        = list(string)
   default     = []
+}
+
+## DNS zone related variables
+variable "public_dns_zone_name" {
+  description = "Name of a public DNS zone to create with the kubernetes cluster"
+  type        = string
+  default     = null
 }
 
 ## Key Vault related variables
@@ -1313,6 +1336,12 @@ variable "prometheus_workspace_public_access_enabled" {
   default     = true
 }
 
+variable "enable_prometheus_monitoring_private_endpoint" {
+  description = "Enable private endpoint for Prometheus monitoring"
+  type        = bool
+  default     = false
+}
+
 variable "prometheus_monitoring_private_endpoint_subnet_id" {
   description = "The ID of a subnet to create a private endpoint for Prometheus monitoring"
   type        = string
@@ -1409,4 +1438,45 @@ variable "tags" {
   description = "A map of custom tags to be attached to this module resources"
   type        = map(string)
   default     = {}
+}
+variable "workload_user_assigned_identities" {
+  description = "Map of additional user-assigned identities for workloads."
+  type = map(object({
+    name_override = optional(string)
+    location      = optional(string)
+  }))
+  default = {}
+}
+
+variable "workload_federated_credentials" {
+  description = <<-EOT
+    Map of federated identity credentials that allow AKS workloads
+    (Kubernetes ServiceAccounts) to assume Azure user-assigned
+    managed identities using OIDC (Workload Identity).
+  EOT
+
+  type = map(object({
+    # Key referencing workload_user_assigned_identities
+    user_assigned_identity_key = string
+
+    # Name of the federated identity credential resource
+    name = string
+
+    # Kubernetes ServiceAccount details
+    namespace            = string
+    service_account_name = string
+
+    # Audience for the federated credential
+    audience = optional(list(string), ["api://AzureADTokenExchange"])
+  }))
+
+  default = {}
+
+  # Optional: simple validation only on this variable's structure
+  validation {
+    condition = alltrue([
+      for _, fic in var.workload_federated_credentials : length(fic.name) > 0
+    ])
+    error_message = "Each workload_federated_credentials entry must have a non-empty 'name'."
+  }
 }

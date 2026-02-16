@@ -76,6 +76,13 @@ module "vnet" {
   depends_on = [module.resource_group]
 }
 
+# wait some time before cleaning up the vnet
+resource "time_sleep" "wait_after_destroy" {
+  destroy_duration = var.time_to_wait_after_destroy
+
+  depends_on = [module.vnet]
+}
+
 module "aks" {
   source = "../.."
 
@@ -105,6 +112,10 @@ module "aks" {
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   secret_rotation_enabled            = var.secret_rotation_enabled
   secret_rotation_interval           = var.secret_rotation_interval
+
+  cluster_identity_role_assignments = {
+    "vnet" = ["Network Contributor", module.vnet.vnet_id]
+  }
 
   node_pools = {
     apppool1 = {
@@ -152,11 +163,35 @@ module "aks" {
   prometheus_default_rule_group_naming             = var.prometheus_default_rule_group_naming
   prometheus_default_rule_group_interval           = var.prometheus_default_rule_group_interval
   prometheus_workspace_public_access_enabled       = var.prometheus_workspace_public_access_enabled
+  enable_prometheus_monitoring_private_endpoint    = var.enable_prometheus_monitoring_private_endpoint
   prometheus_monitoring_private_endpoint_subnet_id = module.vnet.vnet_subnets_name_id["subnet-private-endpoint"]
 
   prometheus_rule_groups = var.prometheus_rule_groups
 
   tags = var.tags
 
-  depends_on = [module.vnet]
+  depends_on = [module.vnet, time_sleep.wait_after_destroy]
+  # Required for workload identity / federated credentials
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
+  workload_user_assigned_identities = {
+    testidentity = {
+      name_override = "${try(
+        module.resource_names["aks"].dns_compliant_minimal,
+        "aks-fallback"
+      )}-uai-test"
+    }
+  }
+  workload_federated_credentials = {
+    testcred = {
+      user_assigned_identity_key = "testidentity"
+      name                       = "aks-test-workload-fic"
+
+      namespace            = "default"
+      service_account_name = "test-app"
+
+      # Optional: audience list
+      audience = ["api://AzureADTokenExchange"]
+    }
+  }
 }
