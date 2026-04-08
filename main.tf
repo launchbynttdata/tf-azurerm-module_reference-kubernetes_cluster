@@ -699,3 +699,41 @@ module "monitor_metric_alert" {
 
   depends_on = [module.resource_group, module.aks]
 }
+
+module "monitor_scheduled_query_alert" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_scheduled_query_alert/azurerm"
+  version = "~> 1.0.2"
+
+  for_each = var.scheduled_query_alerts
+
+  alert_name          = each.key
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
+  location            = var.region
+
+  data_source_id = coalesce(
+    try(each.value.data_source_id, null),
+    try(module.application_insights[0].id, null),
+    try(var.log_analytics_workspace.id, null),
+    try(module.aks.azurerm_log_analytics_workspace_id, null)
+  )
+  description             = each.value.description
+  enabled                 = each.value.enabled
+  query                   = each.value.query
+  severity                = each.value.severity
+  frequency               = each.value.frequency
+  time_window             = each.value.time_window
+  authorized_resource_ids = each.value.authorized_resource_ids
+  trigger_operator        = each.value.trigger_operator
+  trigger_threshold       = each.value.trigger_threshold
+  action_group_ids = concat(
+    var.action_group != null ? [module.monitor_action_group[0].action_group_id] : [],
+    var.action_group_ids,
+    each.value.action_group_ids
+  )
+  email_subject          = each.value.email_subject
+  custom_webhook_payload = each.value.custom_webhook_payload
+
+  tags = var.tags
+
+  depends_on = [module.resource_group, module.aks, module.application_insights]
+}

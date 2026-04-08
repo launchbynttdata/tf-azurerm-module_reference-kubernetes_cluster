@@ -1517,6 +1517,36 @@ variable "metric_alerts" {
     error_message = "At least one of 'criteria', 'dynamic_criteria' must be defined for all metric alerts."
   }
 }
+
+variable "scheduled_query_alerts" {
+  description = <<EOT
+  A map of scheduled query alert objects. Each key is used as the alert name.
+  `data_source_id` is optional and, when omitted, defaults to one of:
+  1) created Application Insights, 2) provided Log Analytics workspace, 3) AKS workspace output.
+  EOT
+  type = map(object({
+    data_source_id          = optional(string)
+    description             = optional(string, "")
+    enabled                 = optional(bool, true)
+    query                   = string
+    severity                = optional(number, 1)
+    frequency               = optional(number, 5)
+    time_window             = optional(number, 30)
+    authorized_resource_ids = optional(list(string), [])
+    trigger_operator        = optional(string, "GreaterThan")
+    trigger_threshold       = optional(number, 0)
+    action_group_ids        = optional(list(string), [])
+    email_subject           = optional(string, "Alert Notification")
+    custom_webhook_payload  = optional(string, "{}")
+  }))
+  default = {}
+
+  validation {
+    condition     = alltrue([for _, alert in var.scheduled_query_alerts : can(jsondecode(alert.custom_webhook_payload))])
+    error_message = "Each scheduled_query_alerts.custom_webhook_payload must be a valid JSON string."
+  }
+}
+
 variable "workload_user_assigned_identities" {
   description = "Map of additional user-assigned identities for workloads."
   type = map(object({

@@ -36,6 +36,8 @@ module "aks" {
   agents_pool_name   = var.agents_pool_name
   os_disk_size_gb    = var.os_disk_size_gb
 
+  create_application_insights = true
+
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
 
@@ -105,6 +107,38 @@ module "aks" {
         operator          = "LessThan"
         alert_sensitivity = "Medium"
       }
+    }
+  })
+
+  scheduled_query_alerts = merge(var.scheduled_query_alerts, {
+    appinsights_request_count_simple = {
+      description       = "Simple alert on request volume"
+      query             = <<-QUERY
+        requests
+        | where timestamp > ago(5m)
+        | summarize total_requests = count()
+      QUERY
+      severity          = 2
+      frequency         = 5
+      time_window       = 5
+      trigger_operator  = "GreaterThan"
+      trigger_threshold = 50
+      email_subject     = "AKS App Insights - Request count threshold breached"
+    }
+    appinsights_failed_requests_simple = {
+      description       = "Simple alert on failed request count"
+      query             = <<-QUERY
+        requests
+        | where timestamp > ago(5m)
+        | where success == false
+        | summarize failed_requests = count()
+      QUERY
+      severity          = 2
+      frequency         = 5
+      time_window       = 5
+      trigger_operator  = "GreaterThan"
+      trigger_threshold = 1
+      email_subject     = "AKS App Insights - Failed request threshold breached"
     }
   })
 
