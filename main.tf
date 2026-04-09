@@ -710,11 +710,14 @@ module "monitor_scheduled_query_alert" {
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location            = var.region
 
-  data_source_id = coalesce(
-    try(each.value.data_source_id, null),
-    try(module.application_insights[0].id, null),
-    try(var.log_analytics_workspace.id, null),
-    try(module.aks.azurerm_log_analytics_workspace_id, null)
+  data_source_id = try(
+    coalesce(
+      try(each.value.data_source_id, null),
+      try(module.application_insights[0].id, null),
+      try(var.log_analytics_workspace.id, null),
+      try(module.aks.azurerm_log_analytics_workspace_id, null)
+    ),
+    null
   )
   description             = each.value.description
   enabled                 = each.value.enabled

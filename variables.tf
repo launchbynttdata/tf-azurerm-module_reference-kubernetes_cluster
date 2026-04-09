@@ -1445,7 +1445,7 @@ variable "action_group" {
   description = <<EOT
   An action group object. Each action group can have:
   - name: (Required) The name of the action group
-  - short_name: (Required) The short name of the action group
+  - short_name: (Required) The short name of the action group (Azure limit: 12 characters)
   - arm_role_receivers: (Optional) List of ARM role receivers
   - email_receivers: (Optional) List of email receivers
   EOT
@@ -1464,6 +1464,11 @@ variable "action_group" {
     })), [])
   })
   default = null
+
+  validation {
+    condition     = var.action_group == null || try(length(var.action_group.short_name) <= 12, true)
+    error_message = "action_group.short_name must be 12 characters or fewer (Azure limit)."
+  }
 }
 
 variable "action_group_ids" {
@@ -1512,9 +1517,11 @@ variable "metric_alerts" {
   default = {}
   validation {
     condition = alltrue(
-      [for alert in var.metric_alerts : !(alert.criteria == null && alert.dynamic_criteria == null)]
+      [for alert in var.metric_alerts : !(
+        (alert.criteria == null || length(alert.criteria) == 0) && alert.dynamic_criteria == null
+      )]
     )
-    error_message = "At least one of 'criteria', 'dynamic_criteria' must be defined for all metric alerts."
+    error_message = "At least one of 'criteria' (non-empty) or 'dynamic_criteria' must be defined for all metric alerts."
   }
 }
 

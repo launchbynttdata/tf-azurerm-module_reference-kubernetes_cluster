@@ -178,6 +178,21 @@ output "network_profile" {
   value       = module.aks.network_profile
 }
 
+output "monitor_action_group_id" {
+  description = "The ID of the Monitor Action Group created by this module. Null when action_group is not configured."
+  value       = try(module.monitor_action_group[0].action_group_id, null)
+}
+
+output "monitor_metric_alert_ids" {
+  description = "A map of metric alert names to their resource IDs."
+  value       = { for k, v in module.monitor_metric_alert : k => v.metric_alert_id }
+}
+
+output "monitor_scheduled_query_alert_ids" {
+  description = "A map of scheduled query alert names to their resource IDs."
+  value       = { for k, v in module.monitor_scheduled_query_alert : k => v.scheduled_query_alert_id }
+}
+
 output "password" {
   description = "The `password` in the `azurerm_kubernetes_cluster`'s `kube_config` block. A password or token used to authenticate to the Kubernetes cluster."
   sensitive   = true
