@@ -1481,11 +1481,12 @@ variable "action_group_ids" {
 variable "metric_alerts" {
   description = "A map of metric alert objects. Each key is used as the alert name."
   type = map(object({
-    description        = string
-    frequency          = optional(string, "PT1M")
-    severity           = optional(number, 3)
-    enabled            = optional(bool, true)
-    webhook_properties = optional(map(string))
+    description           = string
+    frequency             = optional(string, "PT1M")
+    severity              = optional(number, 3)
+    enabled               = optional(bool, true)
+    target_resource_types = optional(set(string), ["aks"]) # Allowed values: "aks", "app_insights"
+    webhook_properties    = optional(map(string))
     criteria = optional(list(object({
       metric_namespace       = string
       metric_name            = string
