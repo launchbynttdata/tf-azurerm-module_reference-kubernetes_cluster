@@ -1439,6 +1439,122 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+# Monitor Action Group Properties
+variable "action_group" {
+  description = <<EOT
+  An action group object. Each action group can have:
+  - name: (Required) The name of the action group
+  - short_name: (Required) The short name of the action group (Azure limit: 12 characters)
+  - arm_role_receivers: (Optional) List of ARM role receivers
+  - email_receivers: (Optional) List of email receivers
+  EOT
+  type = object({
+    name       = string
+    short_name = string
+    arm_role_receivers = optional(list(object({
+      name                    = string
+      role_id                 = string
+      use_common_alert_schema = optional(bool)
+    })), [])
+    email_receivers = optional(list(object({
+      name                    = string
+      email_address           = string
+      use_common_alert_schema = optional(bool)
+    })), [])
+  })
+  default = null
+
+  validation {
+    condition     = var.action_group == null || try(length(var.action_group.short_name) <= 12, true)
+    error_message = "action_group.short_name must be 12 characters or fewer (Azure limit)."
+  }
+}
+
+variable "action_group_ids" {
+  description = "A list of additional action group IDs to notify on metric alerts."
+  type        = list(string)
+  default     = []
+}
+
+# Monitor Metric Alert Properties
+variable "metric_alerts" {
+  description = "A map of metric alert objects. Each key is used as the alert name."
+  type = map(object({
+    description           = string
+    frequency             = optional(string, "PT1M")
+    severity              = optional(number, 3)
+    enabled               = optional(bool, true)
+    target_resource_types = optional(set(string), ["aks"]) # Allowed values: "aks", "app_insights"
+    webhook_properties    = optional(map(string))
+    criteria = optional(list(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      threshold              = number
+      skip_metric_validation = optional(bool, false)
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })), [])
+    })))
+    dynamic_criteria = optional(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      alert_sensitivity      = string
+      ignore_data_before     = optional(string)
+      skip_metric_validation = optional(bool, false)
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })), [])
+    }))
+  }))
+  default = {}
+  validation {
+    condition = alltrue(
+      [for alert in var.metric_alerts : !(
+        (alert.criteria == null || length(alert.criteria) == 0) && alert.dynamic_criteria == null
+      )]
+    )
+    error_message = "At least one of 'criteria' (non-empty) or 'dynamic_criteria' must be defined for all metric alerts."
+  }
+}
+
+variable "scheduled_query_alerts" {
+  description = <<EOT
+  A map of scheduled query alert objects. Each key is used as the alert name.
+  `data_source_id` is optional and, when omitted, defaults to one of:
+  1) created Application Insights, 2) provided Log Analytics workspace, 3) AKS workspace output.
+  EOT
+  type = map(object({
+    data_source_id          = optional(string)
+    description             = optional(string, "")
+    enabled                 = optional(bool, true)
+    query                   = string
+    severity                = optional(number, 1)
+    frequency               = optional(number, 5)
+    time_window             = optional(number, 30)
+    authorized_resource_ids = optional(list(string), [])
+    trigger_operator        = optional(string, "GreaterThan")
+    trigger_threshold       = optional(number, 0)
+    action_group_ids        = optional(list(string), [])
+    email_subject           = optional(string, "Alert Notification")
+    custom_webhook_payload  = optional(string, "{}")
+  }))
+  default = {}
+
+  validation {
+    condition     = alltrue([for _, alert in var.scheduled_query_alerts : can(jsondecode(alert.custom_webhook_payload))])
+    error_message = "Each scheduled_query_alerts.custom_webhook_payload must be a valid JSON string."
+  }
+}
+
 variable "workload_user_assigned_identities" {
   description = "Map of additional user-assigned identities for workloads."
   type = map(object({

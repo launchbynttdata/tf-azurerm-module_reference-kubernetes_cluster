@@ -1,7 +1,7 @@
 product_family  = "dso"
 product_service = "akspvt"
 
-kubernetes_version        = "1.32"
+kubernetes_version        = "1.33"
 agents_count              = 2
 agents_availability_zones = [1, 2]
 
