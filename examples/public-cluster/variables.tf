@@ -312,3 +312,34 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "workload_user_assigned_identities" {
+  description = "Map of workload user-assigned managed identities to create."
+  type = map(object({
+    name_override = optional(string)
+    location      = optional(string)
+  }))
+  default = {}
+}
+
+variable "workload_federated_credentials" {
+  description = "Map of federated identity credentials linking k8s ServiceAccounts to workload UAIs."
+  type = map(object({
+    user_assigned_identity_key = string
+    name                       = string
+    namespace                  = string
+    service_account_name       = string
+    audience                   = optional(list(string), ["api://AzureADTokenExchange"])
+  }))
+  default = {}
+}
+
+variable "workload_identity_role_assignments" {
+  description = "Map of role assignments for workload identities on Azure resources."
+  type = map(object({
+    workload_identity_key = string
+    role_definition_name  = string
+    scope                 = string
+  }))
+  default = {}
+}

@@ -42,6 +42,10 @@ module "aks" {
 
   log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 
+  workload_user_assigned_identities  = var.workload_user_assigned_identities
+  workload_federated_credentials     = var.workload_federated_credentials
+  workload_identity_role_assignments = var.workload_identity_role_assignments
+
   secrets = {
     username = "test102"
     password = random_password.password.result

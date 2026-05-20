@@ -153,6 +153,22 @@ module "workload_federated_identity_credentials" {
   ]
 }
 
+# Grant roles to workload identities on Azure resources (e.g. Key Vault, DNS Zone)
+module "workload_identity_role_assignments" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.workload_identity_role_assignments
+
+  principal_id         = module.workload_user_assigned_identities[each.value.workload_identity_key].principal_id
+  role_definition_name = each.value.role_definition_name
+  scope                = each.value.scope
+
+  depends_on = [
+    module.workload_user_assigned_identities
+  ]
+}
+
 module "cluster_identity_roles" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"

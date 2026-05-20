@@ -35,3 +35,18 @@ node_pools = {
 public_dns_zone_name = "terratest.example-1.com"
 
 log_analytics_workspace_daily_quota_gb = 5
+
+workload_user_assigned_identities = {
+  external_dns = {}
+}
+
+workload_federated_credentials = {
+  external_dns_fic = {
+    user_assigned_identity_key = "external_dns"
+    name                       = "external-dns-fic"
+    namespace                  = "external-dns"
+    service_account_name       = "external-dns"
+  }
+}
+
+workload_identity_role_assignments = {}
