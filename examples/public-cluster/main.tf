@@ -16,6 +16,26 @@ resource "random_password" "password" {
   length = 10
 }
 
+module "resource_group" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
+  version = "~> 1.0"
+
+  name     = var.test_resource_group_name
+  location = var.region
+  tags     = var.tags
+}
+
+# Local to build example role assignment for testing
+locals {
+  example_role_assignments = var.create_test_role_assignment ? {
+    test_role_assignment = {
+      workload_identity_key = "test_workload_identity"
+      role_definition_name  = "Reader"
+      scope                 = module.resource_group.id
+    }
+  } : {}
+}
+
 module "aks" {
   source = "../.."
 
@@ -42,9 +62,12 @@ module "aks" {
 
   log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 
+  oidc_issuer_enabled       = var.oidc_issuer_enabled
+  workload_identity_enabled = var.workload_identity_enabled
+
   workload_user_assigned_identities  = var.workload_user_assigned_identities
   workload_federated_credentials     = var.workload_federated_credentials
-  workload_identity_role_assignments = var.workload_identity_role_assignments
+  workload_identity_role_assignments = merge(var.workload_identity_role_assignments, local.example_role_assignments)
 
   secrets = {
     username = "test102"

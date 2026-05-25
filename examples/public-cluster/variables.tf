@@ -307,6 +307,18 @@ variable "public_dns_zone_name" {
   default     = null
 }
 
+variable "oidc_issuer_enabled" {
+  description = "Enable or Disable the OIDC issuer URL for AKS."
+  type        = bool
+  default     = false
+}
+
+variable "workload_identity_enabled" {
+  description = "Enable or Disable Workload Identity for AKS."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "A map of custom tags to be attached to this module resources"
   type        = map(string)
@@ -342,4 +354,16 @@ variable "workload_identity_role_assignments" {
     scope                 = string
   }))
   default = {}
+}
+
+variable "create_test_role_assignment" {
+  description = "Whether to create a test role assignment on the example resource group to demonstrate workload identity capabilities."
+  type        = bool
+  default     = true
+}
+
+variable "test_resource_group_name" {
+  description = "Resource group name used by the public-cluster example for test role assignment scope."
+  type        = string
+  default     = "dso-kube-eus-dev-000-rg-test"
 }
