@@ -1596,3 +1596,13 @@ variable "workload_federated_credentials" {
     error_message = "Each workload_federated_credentials entry must have a non-empty 'name'."
   }
 }
+
+variable "workload_identity_role_assignments" {
+  description = "Map of role assignments for workload identities on external Azure resources (e.g. Key Vault). Scope must be a full Azure resource ID."
+  type = map(object({
+    workload_identity_key = string
+    role_definition_name  = string
+    scope                 = string
+  }))
+  default = {}
+}

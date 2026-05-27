@@ -307,8 +307,63 @@ variable "public_dns_zone_name" {
   default     = null
 }
 
+variable "oidc_issuer_enabled" {
+  description = "Enable or Disable the OIDC issuer URL for AKS."
+  type        = bool
+  default     = false
+}
+
+variable "workload_identity_enabled" {
+  description = "Enable or Disable Workload Identity for AKS."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "A map of custom tags to be attached to this module resources"
   type        = map(string)
   default     = {}
+}
+
+variable "workload_user_assigned_identities" {
+  description = "Map of workload user-assigned managed identities to create."
+  type = map(object({
+    name_override = optional(string)
+    location      = optional(string)
+  }))
+  default = {}
+}
+
+variable "workload_federated_credentials" {
+  description = "Map of federated identity credentials linking k8s ServiceAccounts to workload UAIs."
+  type = map(object({
+    user_assigned_identity_key = string
+    name                       = string
+    namespace                  = string
+    service_account_name       = string
+    audience                   = optional(list(string), ["api://AzureADTokenExchange"])
+  }))
+  default = {}
+}
+
+variable "workload_identity_role_assignments" {
+  description = "Map of role assignments for workload identities on Azure resources."
+  type = map(object({
+    workload_identity_key = string
+    role_definition_name  = string
+    scope                 = string
+  }))
+  default = {}
+}
+
+variable "create_test_role_assignment" {
+  description = "Whether to create a test role assignment on the example resource group to demonstrate workload identity capabilities."
+  type        = bool
+  default     = true
+}
+
+variable "test_resource_group_name" {
+  description = "Resource group name used by the public-cluster example for test role assignment scope."
+  type        = string
+  default     = "dso-kube-eus-dev-000-rg-test"
 }
