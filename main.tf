@@ -446,9 +446,9 @@ module "public_dns_zone" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/dns_zone/azurerm"
   version = "~> 1.0"
 
-  count = var.public_dns_zone_name != null ? 1 : 0
+  count = length(local.public_dns_zone_names) > 0 ? 1 : 0
 
-  domain_names        = [var.public_dns_zone_name]
+  domain_names        = local.public_dns_zone_names
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   resource_name_tag   = module.resource_names["public_dns_zone"].standard
   tags                = local.tags
@@ -460,11 +460,11 @@ module "kubelet_public_dns_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
-  count = var.public_dns_zone_name != null ? 1 : 0
+  for_each = local.public_dns_zone_ids
 
   principal_id         = module.aks.kubelet_identity[0].object_id
   role_definition_name = "DNS Zone Contributor"
-  scope                = module.public_dns_zone[0].ids[0]
+  scope                = each.value
 
   depends_on = [module.aks, module.public_dns_zone]
 }
@@ -473,13 +473,23 @@ module "kubelet_resource_group_reader" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
-  count = (var.public_dns_zone_name != null && length(module.resource_group) > 0) ? 1 : 0
+  count = (length(local.public_dns_zone_names) > 0 && length(module.resource_group) > 0) ? 1 : 0
 
   principal_id         = module.aks.kubelet_identity[0].object_id
   role_definition_name = "Reader"
   scope                = module.resource_group[0].id
 
   depends_on = [module.aks, module.public_dns_zone]
+}
+
+module "public_dns_records" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/public_dns_records/azurerm"
+  version = "~> 1.1"
+
+  a_records  = local.public_dns_a_records
+  ns_records = local.public_dns_ns_records
+
+  depends_on = [module.public_dns_zone]
 }
 
 module "application_insights" {

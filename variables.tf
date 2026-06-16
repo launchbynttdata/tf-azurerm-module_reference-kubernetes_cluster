@@ -1186,6 +1186,33 @@ variable "public_dns_zone_name" {
   default     = null
 }
 
+variable "public_dns_zone_names" {
+  description = "Additional public DNS zones to create with the kubernetes cluster"
+  type        = list(string)
+  default     = []
+}
+
+variable "public_dns_zone_delegations" {
+  description = "Optional NS delegations keyed by child zone name. Child zone must exist in public_dns_zone_name/public_dns_zone_names"
+  type = map(object({
+    parent_zone_name                = string
+    parent_zone_resource_group_name = string
+    ttl                             = optional(number, 300)
+  }))
+  default = {}
+}
+
+variable "public_dns_zone_root_a_records" {
+  description = "Optional root A records keyed by zone name. Zone must exist in public_dns_zone_name/public_dns_zone_names"
+  type = map(object({
+    resource_group_name = string
+    record_name         = optional(string, "@")
+    ttl                 = optional(number, 300)
+    records             = list(string)
+  }))
+  default = {}
+}
+
 ## Key Vault related variables
 variable "kv_soft_delete_retention_days" {
   description = "Number of retention days for soft delete for key vault"

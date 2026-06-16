@@ -58,7 +58,11 @@ module "aks" {
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
 
-  public_dns_zone_name = var.public_dns_zone_name
+  public_dns_zone_name  = var.public_dns_zone_name
+  public_dns_zone_names = var.public_dns_zone_names
+
+  public_dns_zone_delegations    = var.public_dns_zone_delegations
+  public_dns_zone_root_a_records = var.public_dns_zone_root_a_records
 
   log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 

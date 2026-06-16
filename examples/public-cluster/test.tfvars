@@ -32,7 +32,17 @@ node_pools = {
   }
 }
 
-public_dns_zone_name = "terratest.example-1.com"
+public_dns_zone_name  = "terratest.example-1.com"
+public_dns_zone_names = ["terratest.example-2.com"]
+
+public_dns_zone_root_a_records = {
+  "terratest.example-1.com" = {
+    resource_group_name = "dso-kube-eus-dev-000-rg-test"
+    record_name         = "@"
+    ttl                 = 300
+    records             = ["1.1.1.1"]
+  }
+}
 
 log_analytics_workspace_daily_quota_gb = 5
 

@@ -61,4 +61,46 @@ locals {
   all_subnet_ids       = toset(concat([var.vnet_subnet_id], local.node_pool_subnet_ids))
 
   tags = merge(local.default_tags, var.tags)
+
+  # Backward-compatible merge of singular and plural public DNS zone inputs.
+  public_dns_zone_names = distinct(concat(
+    var.public_dns_zone_name != null ? [var.public_dns_zone_name] : [],
+    var.public_dns_zone_names,
+  ))
+
+  public_dns_zone_ids = length(module.public_dns_zone) > 0 ? zipmap(
+    sort(local.public_dns_zone_names),
+    module.public_dns_zone[0].ids,
+  ) : {}
+
+  public_dns_zone_name_servers = length(module.public_dns_zone) > 0 ? zipmap(
+    sort(local.public_dns_zone_names),
+    module.public_dns_zone[0].name_servers,
+  ) : {}
+
+  public_dns_ns_records = {
+    for child_zone_name, delegation in var.public_dns_zone_delegations :
+    child_zone_name => {
+      name                = trimsuffix(child_zone_name, ".${delegation.parent_zone_name}")
+      resource_group_name = delegation.parent_zone_resource_group_name
+      zone_name           = delegation.parent_zone_name
+      ttl                 = delegation.ttl
+      records             = local.public_dns_zone_name_servers[child_zone_name]
+      tags                = var.tags
+    }
+    if contains(local.public_dns_zone_names, child_zone_name)
+  }
+
+  public_dns_a_records = {
+    for zone_name, record in var.public_dns_zone_root_a_records :
+    zone_name => {
+      name                = record.record_name
+      resource_group_name = record.resource_group_name
+      zone_name           = zone_name
+      ttl                 = record.ttl
+      records             = record.records
+      tags                = var.tags
+    }
+    if contains(local.public_dns_zone_names, zone_name)
+  }
 }

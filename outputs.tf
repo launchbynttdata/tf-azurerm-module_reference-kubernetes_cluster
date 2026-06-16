@@ -221,13 +221,23 @@ output "private_cluster_dns_zone_name" {
 }
 
 output "public_dns_zone_id" {
-  description = "Id of the public DNS zone created with the cluster"
-  value       = try(module.public_dns_zone[0].ids[0], "")
+  description = "Id of the first public DNS zone created with the cluster"
+  value       = try(local.public_dns_zone_ids[local.public_dns_zone_names[0]], "")
 }
 
 output "public_dns_zone_name_servers" {
-  description = "Name of the public DNS zone created with the cluster"
-  value       = try(module.public_dns_zone[0].name_servers[0], "")
+  description = "Name servers of the first public DNS zone created with the cluster"
+  value       = try(local.public_dns_zone_name_servers[local.public_dns_zone_names[0]][0], "")
+}
+
+output "public_dns_zone_ids" {
+  description = "Map of public DNS zone names to IDs created with the cluster"
+  value       = local.public_dns_zone_ids
+}
+
+output "public_dns_zone_name_servers_map" {
+  description = "Map of public DNS zone names to name server lists created with the cluster"
+  value       = local.public_dns_zone_name_servers
 }
 
 output "user_assigned_msi_object_id" {
