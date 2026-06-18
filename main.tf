@@ -67,7 +67,7 @@ module "key_vault" {
 # Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
 module "key_vault_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
   count = var.create_key_vault ? 1 : 0
 
@@ -458,9 +458,26 @@ module "public_dns_zone" {
 
 module "kubelet_public_dns_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
-  for_each = local.public_dns_zone_ids
+  count = length(local.public_dns_zone_names) > 0 ? 1 : 0
+
+  principal_id         = module.aks.kubelet_identity[0].object_id
+  role_definition_name = "DNS Zone Contributor"
+  scope                = local.public_dns_zone_ids[sort(local.public_dns_zone_names)[0]]
+
+  depends_on = [module.aks, module.public_dns_zone]
+}
+
+module "kubelet_public_dns_contributor_additional" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.3"
+
+  for_each = {
+    for zone_name, zone_id in local.public_dns_zone_ids :
+    zone_name => zone_id
+    if zone_name != sort(local.public_dns_zone_names)[0]
+  }
 
   principal_id         = module.aks.kubelet_identity[0].object_id
   role_definition_name = "DNS Zone Contributor"
@@ -471,7 +488,7 @@ module "kubelet_public_dns_contributor" {
 
 module "kubelet_resource_group_reader" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
   count = (length(local.public_dns_zone_names) > 0 && length(module.resource_group) > 0) ? 1 : 0
 
@@ -486,7 +503,7 @@ module "public_dns_records" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/public_dns_records/azurerm"
   version = "~> 1.1"
 
-  a_records  = local.public_dns_a_records
+  a_records  = local.public_dns_a_records_normalized
   ns_records = local.public_dns_ns_records
 
   depends_on = [module.public_dns_zone]

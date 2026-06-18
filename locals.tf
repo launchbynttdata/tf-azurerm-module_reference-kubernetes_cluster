@@ -91,11 +91,11 @@ locals {
     if contains(local.public_dns_zone_names, child_zone_name)
   }
 
-  public_dns_a_records = {
-    for zone_name, record in var.public_dns_zone_root_a_records :
+  public_dns_a_records_normalized = {
+    for zone_name, record in var.public_dns_zone_a_records :
     zone_name => {
       name                = record.record_name
-      resource_group_name = record.resource_group_name
+      resource_group_name = record.resource_group_name != null ? record.resource_group_name : (var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name)
       zone_name           = zone_name
       ttl                 = record.ttl
       records             = record.records

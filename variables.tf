@@ -1187,13 +1187,13 @@ variable "public_dns_zone_name" {
 }
 
 variable "public_dns_zone_names" {
-  description = "Additional public DNS zones to create with the kubernetes cluster"
+  description = "Additional public DNS zones to create with the kubernetes cluster. Each zone name will be created as a separate DNS Zone resource."
   type        = list(string)
   default     = []
 }
 
 variable "public_dns_zone_delegations" {
-  description = "Optional NS delegations keyed by child zone name. Child zone must exist in public_dns_zone_name/public_dns_zone_names"
+  description = "Optional NS delegations keyed by child zone name. Creates NS records in the parent zone that delegate to the child zone nameservers. Child zone must exist in public_dns_zone_name/public_dns_zone_names."
   type = map(object({
     parent_zone_name                = string
     parent_zone_resource_group_name = string
@@ -1202,10 +1202,10 @@ variable "public_dns_zone_delegations" {
   default = {}
 }
 
-variable "public_dns_zone_root_a_records" {
-  description = "Optional root A records keyed by zone name. Zone must exist in public_dns_zone_name/public_dns_zone_names"
+variable "public_dns_zone_a_records" {
+  description = "Optional A records keyed by zone name. Creates A records (typically root/@ records) in the specified zones. Zone must exist in public_dns_zone_name/public_dns_zone_names. resource_group_name is optional and defaults to the cluster resource group."
   type = map(object({
-    resource_group_name = string
+    resource_group_name = optional(string)
     record_name         = optional(string, "@")
     ttl                 = optional(number, 300)
     records             = list(string)

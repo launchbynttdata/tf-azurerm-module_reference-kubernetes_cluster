@@ -35,12 +35,11 @@ node_pools = {
 public_dns_zone_name  = "terratest.example-1.com"
 public_dns_zone_names = ["terratest.example-2.com"]
 
-public_dns_zone_root_a_records = {
+public_dns_zone_a_records = {
   "terratest.example-1.com" = {
-    resource_group_name = "dso-kube-eus-dev-000-rg-test"
-    record_name         = "@"
-    ttl                 = 300
-    records             = ["1.1.1.1"]
+    record_name = "@"
+    ttl         = 300
+    records     = ["1.1.1.1"]
   }
 }
 

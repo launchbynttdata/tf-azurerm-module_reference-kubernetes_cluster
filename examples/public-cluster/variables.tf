@@ -323,10 +323,10 @@ variable "public_dns_zone_delegations" {
   default = {}
 }
 
-variable "public_dns_zone_root_a_records" {
-  description = "Optional root A records keyed by zone name"
+variable "public_dns_zone_a_records" {
+  description = "Optional A records keyed by zone name. resource_group_name is optional and defaults to cluster resource group"
   type = map(object({
-    resource_group_name = string
+    resource_group_name = optional(string)
     record_name         = optional(string, "@")
     ttl                 = optional(number, 300)
     records             = list(string)
