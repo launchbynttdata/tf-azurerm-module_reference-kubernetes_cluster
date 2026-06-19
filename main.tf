@@ -460,11 +460,11 @@ module "kubelet_public_dns_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.3"
 
-  count = length(local.public_dns_zone_names) > 0 ? 1 : 0
+  count = local.public_dns_primary_zone_name != null ? 1 : 0
 
   principal_id         = module.aks.kubelet_identity[0].object_id
   role_definition_name = "DNS Zone Contributor"
-  scope                = local.public_dns_zone_ids[sort(local.public_dns_zone_names)[0]]
+  scope                = local.public_dns_zone_ids[local.public_dns_primary_zone_name]
 
   depends_on = [module.aks, module.public_dns_zone]
 }
@@ -473,11 +473,7 @@ module "kubelet_public_dns_contributor_additional" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.3"
 
-  for_each = {
-    for zone_name, zone_id in local.public_dns_zone_ids :
-    zone_name => zone_id
-    if zone_name != sort(local.public_dns_zone_names)[0]
-  }
+  for_each = local.public_dns_additional_zone_ids
 
   principal_id         = module.aks.kubelet_identity[0].object_id
   role_definition_name = "DNS Zone Contributor"

@@ -68,15 +68,25 @@ locals {
     var.public_dns_zone_names,
   ))
 
+  # Keep deterministic ordering and a single source of truth for primary vs additional zones.
+  public_dns_zone_names_sorted = sort(local.public_dns_zone_names)
+  public_dns_primary_zone_name = try(local.public_dns_zone_names_sorted[0], null)
+
   public_dns_zone_ids = length(module.public_dns_zone) > 0 ? zipmap(
-    sort(local.public_dns_zone_names),
+    local.public_dns_zone_names_sorted,
     module.public_dns_zone[0].ids,
   ) : {}
 
   public_dns_zone_name_servers = length(module.public_dns_zone) > 0 ? zipmap(
-    sort(local.public_dns_zone_names),
+    local.public_dns_zone_names_sorted,
     module.public_dns_zone[0].name_servers,
   ) : {}
+
+  public_dns_additional_zone_ids = {
+    for zone_name, zone_id in local.public_dns_zone_ids :
+    zone_name => zone_id
+    if zone_name != local.public_dns_primary_zone_name
+  }
 
   public_dns_ns_records = {
     for child_zone_name, delegation in var.public_dns_zone_delegations :
