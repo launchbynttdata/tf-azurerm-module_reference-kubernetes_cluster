@@ -1041,9 +1041,21 @@ variable "key_vault_name" {
 }
 
 variable "key_vault_role_definition" {
-  description = "Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator`"
+  description = "Deprecated: No longer used. Secret provider now uses key_vault_secret_user_role_name and key_vault_certificates_user_role_name variables for least privilege."
   type        = string
-  default     = "Key Vault Administrator"
+  default     = "Key Vault Secret User"
+}
+
+variable "key_vault_secret_user_role_name" {
+  description = "Name of the Azure RBAC role to assign to the key vault secret provider for read-only access to secrets. Default is 'Key Vault Secret User' (least privilege - read-only, no modifications)."
+  type        = string
+  default     = "Key Vault Secret User"
+}
+
+variable "key_vault_certificates_user_role_name" {
+  description = "Name of the Azure RBAC role to assign to the key vault secret provider for read-only access to certificates. Default is 'Key Vault Certificates User' (least privilege - read-only, no modifications)."
+  type        = string
+  default     = "Key Vault Certificates User"
 }
 
 variable "additional_key_vault_ids" {
@@ -1190,6 +1202,12 @@ variable "public_dns_zone_names" {
   description = "Additional public DNS zones to create with the kubernetes cluster. Each zone name will be created as a separate DNS Zone resource."
   type        = list(string)
   default     = []
+}
+
+variable "kubelet_dns_zone_contributor_role_name" {
+  description = "Name of the Azure RBAC role to assign to kubelet identity on public DNS zones. Default is 'DNS Zone Contributor'. Set to empty string \"\" to disable (recommended - use external-dns workload identity for DNS management instead)."
+  type        = string
+  default     = ""
 }
 
 variable "public_dns_zone_delegations" {

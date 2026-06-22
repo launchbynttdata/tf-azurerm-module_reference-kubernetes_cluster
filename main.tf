@@ -64,29 +64,61 @@ module "key_vault" {
   depends_on = [module.resource_group]
 }
 
-# Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
-module "key_vault_role_assignment" {
+# Assign Key Vault Secret User role on the created Key Vault (read-only access to secrets).
+# This allows the secret provider to READ secrets, but NOT modify them (least privilege per ticket 10684).
+module "key_vault_secret_user_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.3"
 
   count = var.create_key_vault ? 1 : 0
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
-  role_definition_name = var.key_vault_role_definition
+  role_definition_name = var.key_vault_secret_user_role_name
   scope                = module.key_vault[0].key_vault_id
 
   depends_on = [module.aks, module.key_vault]
 }
 
-# The Key Vault MSI must be assigned Role to access the Key Vault from which AKS will retrieve the secrets.
-module "additional_key_vaults_role_assignment" {
+# Assign Key Vault Certificates User role on the created Key Vault (read-only access to certificates).
+# This allows the secret provider to READ certificates, but NOT modify them (least privilege per ticket 10684).
+module "key_vault_certificates_user_role_assignment" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.3"
+
+  count = var.create_key_vault ? 1 : 0
+
+  principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
+  role_definition_name = var.key_vault_certificates_user_role_name
+  scope                = module.key_vault[0].key_vault_id
+
+  depends_on = [module.aks, module.key_vault]
+}
+
+# Assign Key Vault Secret User role on additional key vaults (read-only access to secrets).
+# This allows the secret provider to READ secrets from additional vaults, but NOT modify them (least privilege per ticket 10684).
+module "additional_key_vaults_secret_user_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
   for_each = toset(var.additional_key_vault_ids)
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
-  role_definition_name = var.key_vault_role_definition
+  role_definition_name = var.key_vault_secret_user_role_name
+  scope                = each.key
+
+  depends_on = [module.aks, module.key_vault]
+}
+
+# Assign Key Vault Certificates User role on additional key vaults (read-only access to certificates).
+# This allows the secret provider to READ certificates from additional vaults, but NOT modify them (least privilege per ticket 10684).
+module "additional_key_vaults_certificates_user_role_assignment" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  for_each = toset(var.additional_key_vault_ids)
+
+  principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
+  role_definition_name = var.key_vault_certificates_user_role_name
   scope                = each.key
 
   depends_on = [module.aks, module.key_vault]
@@ -456,27 +488,33 @@ module "public_dns_zone" {
   depends_on = [module.resource_group]
 }
 
+# Optional: Assign DNS Zone Contributor role to kubelet identity on the primary public DNS zone.
+# This is only needed if the kubelet needs to manage DNS records in the zone.
+# Recommended: Leave empty (default) and use external-dns workload identity for DNS management instead (least privilege).
 module "kubelet_public_dns_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.3"
 
-  count = local.public_dns_primary_zone_name != null ? 1 : 0
+  count = length(var.kubelet_dns_zone_contributor_role_name) > 0 && local.public_dns_primary_zone_name != null ? 1 : 0
 
   principal_id         = module.aks.kubelet_identity[0].object_id
-  role_definition_name = "DNS Zone Contributor"
+  role_definition_name = var.kubelet_dns_zone_contributor_role_name
   scope                = local.public_dns_zone_ids[local.public_dns_primary_zone_name]
 
   depends_on = [module.aks, module.public_dns_zone]
 }
 
+# Optional: Assign DNS Zone Contributor role to kubelet identity on additional public DNS zones.
+# This is only needed if the kubelet needs to manage DNS records in these zones.
+# Recommended: Leave empty (default) and use external-dns workload identity for DNS management instead (least privilege).
 module "kubelet_public_dns_contributor_additional" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.3"
 
-  for_each = local.public_dns_additional_zone_ids
+  for_each = length(var.kubelet_dns_zone_contributor_role_name) > 0 ? local.public_dns_additional_zone_ids : {}
 
   principal_id         = module.aks.kubelet_identity[0].object_id
-  role_definition_name = "DNS Zone Contributor"
+  role_definition_name = var.kubelet_dns_zone_contributor_role_name
   scope                = each.value
 
   depends_on = [module.aks, module.public_dns_zone]
