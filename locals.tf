@@ -60,5 +60,10 @@ locals {
   node_pool_subnet_ids = [for pool in keys(var.node_pools) : var.node_pools[pool].vnet_subnet_id]
   all_subnet_ids       = toset(concat([var.vnet_subnet_id], local.node_pool_subnet_ids))
 
+  # Backward-compatible role model: prefer explicit multiple roles, else fallback to single role input.
+  key_vault_role_definitions_effective = distinct(
+    length(var.key_vault_role_definitions) > 0 ? var.key_vault_role_definitions : [var.key_vault_role_definition]
+  )
+
   tags = merge(local.default_tags, var.tags)
 }
