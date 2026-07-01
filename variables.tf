@@ -1055,7 +1055,8 @@ variable "key_vault_role_definitions" {
 variable "additional_key_vault_ids" {
   description = <<EOT
     IDs of the additional key vaults to be associated with the AKS cluster. The key vault MSI will be assigned
-    the role defined in `key_vault_role_definition` on these key vaults.
+    the role(s) defined in `key_vault_role_definitions` (or `key_vault_role_definition` when the list is empty)
+    on these key vaults.
   EOT
   type        = list(string)
   default     = []

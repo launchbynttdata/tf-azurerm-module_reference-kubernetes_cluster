@@ -11,6 +11,17 @@ Some useful examples can be found in the [examples](./examples) directory that d
 1. [Private Cluster](./examples/private-cluster/README.md)
 2. [Public Cluster](./examples/public-cluster/README.md)
 
+## Upgrade Notes
+
+- Existing states that used the default `key_vault_role_definition = "Key Vault Administrator"` are migrated in-place by a `moved` block.
+- If your existing state used a non-default `key_vault_role_definition`, migrate state before apply:
+
+```bash
+terraform state mv \
+  'module.key_vault_role_assignment[0]' \
+  'module.key_vault_role_assignment["<your-role-name>"]'
+```
+
 There are also several other add-ons that can be deployed on the AKS cluster to provide additional functionalities. They are found
 in the [resources](./resources) directory. Few of the add ons are
 1. [Ingress Controller](./resources/ingress-nginx)
@@ -315,7 +326,7 @@ No resources.
 | <a name="input_key_vault_name"></a> [key\_vault\_name](#input\_key\_vault\_name) | The name of the key vault to override the naming module | `string` | `null` | no |
 | <a name="input_key_vault_role_definition"></a> [key\_vault\_role\_definition](#input\_key\_vault\_role\_definition) | Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator` | `string` | `"Key Vault Administrator"` | no |
 | <a name="input_key_vault_role_definitions"></a> [key\_vault\_role\_definitions](#input\_key\_vault\_role\_definitions) | Optional list of roles to assign to the key vault MSI on the key vault(s). If empty, the single role in `key_vault_role_definition` is used for backward compatibility. | `list(string)` | `[]` | no |
-| <a name="input_additional_key_vault_ids"></a> [additional\_key\_vault\_ids](#input\_additional\_key\_vault\_ids) | IDs of the additional key vaults to be associated with the AKS cluster. The key vault MSI will be assigned<br/>    the role defined in `key_vault_role_definition` on these key vaults. | `list(string)` | `[]` | no |
+| <a name="input_additional_key_vault_ids"></a> [additional\_key\_vault\_ids](#input\_additional\_key\_vault\_ids) | IDs of the additional key vaults to be associated with the AKS cluster. The key vault MSI will be assigned<br/>    the role(s) defined in `key_vault_role_definitions` (or `key_vault_role_definition` when the list is empty)<br/>    on these key vaults. | `list(string)` | `[]` | no |
 | <a name="input_enable_rbac_authorization"></a> [enable\_rbac\_authorization](#input\_enable\_rbac\_authorization) | Enable Kubernetes Role-Based Access Control on the Key Vault | `bool` | `false` | no |
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | The SKU Tier that should be used for this Kubernetes Cluster. Possible values are `Free` and `Standard` | `string` | `"Free"` | no |
 | <a name="input_node_resource_group"></a> [node\_resource\_group](#input\_node\_resource\_group) | The auto-generated Resource Group which contains the resources for this Managed Kubernetes Cluster. Changing this forces a new resource to be created. | `string` | `null` | no |
