@@ -78,11 +78,6 @@ module "key_vault_role_assignment" {
   depends_on = [module.aks, module.key_vault]
 }
 
-moved {
-  from = module.key_vault_role_assignment[0]
-  to   = module.key_vault_role_assignment["Key Vault Administrator"]
-}
-
 # The Key Vault MSI must be assigned Role to access the Key Vault from which AKS will retrieve the secrets.
 module "additional_key_vaults_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
@@ -90,7 +85,7 @@ module "additional_key_vaults_role_assignment" {
 
   for_each = {
     for pair in setproduct(var.additional_key_vault_ids, local.key_vault_role_definitions_effective) :
-    length(local.key_vault_role_definitions_effective) == 1 ? pair[0] : "${pair[0]}|${pair[1]}" => {
+    "${pair[0]}|${pair[1]}" => {
       scope                = pair[0]
       role_definition_name = pair[1]
     }
