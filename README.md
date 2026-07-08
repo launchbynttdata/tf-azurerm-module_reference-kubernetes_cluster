@@ -178,6 +178,7 @@ No providers.
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.0 |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | terraform.registry.launch.nttdata.com/module_primitive/key_vault/azurerm | ~> 1.0 |
 | <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_key_vault_additional_role_assignments"></a> [key\_vault\_additional\_role\_assignments](#module\_key\_vault\_additional\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_cluster_identity"></a> [cluster\_identity](#module\_cluster\_identity) | terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm | ~> 1.0 |
 | <a name="module_workload_user_assigned_identities"></a> [workload\_user\_assigned\_identities](#module\_workload\_user\_assigned\_identities) | terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm | ~> 1.0 |

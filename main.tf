@@ -69,7 +69,21 @@ module "key_vault_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
-  for_each = var.create_key_vault ? toset(local.key_vault_role_definitions_effective) : toset([])
+  count = var.create_key_vault ? 1 : 0
+
+  principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
+  role_definition_name = local.key_vault_primary_role_definition
+  scope                = module.key_vault[0].key_vault_id
+
+  depends_on = [module.aks, module.key_vault]
+}
+
+# Assign extra role definitions on the created key vault using keyed addresses.
+module "key_vault_additional_role_assignments" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.create_key_vault ? toset(local.key_vault_additional_role_definitions) : toset([])
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
   role_definition_name = each.value
@@ -83,13 +97,7 @@ module "additional_key_vaults_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
-  for_each = {
-    for pair in setproduct(var.additional_key_vault_ids, local.key_vault_role_definitions_effective) :
-    "${pair[0]}|${pair[1]}" => {
-      scope                = pair[0]
-      role_definition_name = pair[1]
-    }
-  }
+  for_each = local.additional_key_vault_role_assignments_effective
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
   role_definition_name = each.value.role_definition_name
