@@ -13,11 +13,13 @@ Some useful examples can be found in the [examples](./examples) directory that d
 
 ## Upgrade Notes
 
-- Multi-role Key Vault assignment uses keyed `for_each` addresses.
-- This can be a breaking state-address change for existing deployments:
-  - Created key vault assignments: `module.key_vault_role_assignment["<role>"]`
-  - Additional key vault assignments: `module.additional_key_vaults_role_assignment["<kv_id>|<role>"]`
-- Existing states may require `terraform state mv` before apply to avoid destroy/recreate of role assignments.
+- The default Key Vault role-assignment path remains legacy-address compatible to avoid destroy/recreate during upgrade:
+  - Created key vault primary role: `module.key_vault_role_assignment[0]`
+  - Additional key vault primary role per vault: `module.additional_key_vaults_role_assignment["<kv_id>"]`
+- When multiple roles are configured, only additional roles are created as keyed addresses:
+  - Created key vault extra roles: `module.key_vault_additional_role_assignments["<role>"]`
+  - Additional key vault extra roles: `module.additional_key_vaults_role_assignment["<kv_id>|<role>"]`
+- `terraform state mv` is not required for the default single-role path. It may be required only for consumers who already migrated state to a previous keyed-address-only model.
 
 There are also several other add-ons that can be deployed on the AKS cluster to provide additional functionalities. They are found
 in the [resources](./resources) directory. Few of the add ons are
