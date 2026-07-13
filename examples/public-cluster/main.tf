@@ -57,8 +57,11 @@ module "aks" {
 
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
+  create_key_vault                   = true
+  key_vault_role_definitions         = ["Key Vault Administrator", "Key Vault Secrets User"]
 
-  public_dns_zone_name = var.public_dns_zone_name
+  public_dns_zone_name                   = var.public_dns_zone_name
+  kubelet_dns_zone_contributor_role_name = "DNS Zone Contributor"
 
   log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 

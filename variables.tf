@@ -1044,12 +1044,22 @@ variable "key_vault_role_definition" {
   description = "Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator`"
   type        = string
   default     = "Key Vault Administrator"
+
+  validation {
+    condition     = trimspace(var.key_vault_role_definition) != ""
+    error_message = "key_vault_role_definition must not be empty."
+  }
 }
 
 variable "key_vault_role_definitions" {
   description = "Optional list of roles to assign to the key vault MSI on the key vault(s). If empty, the single role in `key_vault_role_definition` is used for backward compatibility."
   type        = list(string)
   default     = []
+
+  validation {
+    condition     = alltrue([for role in var.key_vault_role_definitions : trimspace(role) != ""])
+    error_message = "key_vault_role_definitions must not contain empty role names."
+  }
 }
 
 variable "additional_key_vault_ids" {

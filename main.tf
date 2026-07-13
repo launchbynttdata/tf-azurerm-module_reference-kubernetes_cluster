@@ -67,7 +67,7 @@ module "key_vault" {
 # Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
 module "key_vault_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
   count = var.create_key_vault ? 1 : 0
 
@@ -81,7 +81,7 @@ module "key_vault_role_assignment" {
 # Assign extra role definitions on the created key vault using keyed addresses.
 module "key_vault_additional_role_assignments" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
   for_each = var.create_key_vault ? toset(local.key_vault_additional_role_definitions) : toset([])
 
@@ -95,7 +95,7 @@ module "key_vault_additional_role_assignments" {
 # The Key Vault MSI must be assigned Role to access the Key Vault from which AKS will retrieve the secrets.
 module "additional_key_vaults_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
   for_each = local.additional_key_vault_role_assignments_effective
 

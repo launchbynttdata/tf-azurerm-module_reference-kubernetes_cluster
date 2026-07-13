@@ -19,6 +19,7 @@ Some useful examples can be found in the [examples](./examples) directory that d
 - When multiple roles are configured, only additional roles are created as keyed addresses:
   - Created key vault extra roles: `module.key_vault_additional_role_assignments["<role>"]`
   - Additional key vault extra roles: `module.additional_key_vaults_role_assignment["<kv_id>|<role>"]`
+- When adopting `key_vault_role_definitions`, list the currently assigned legacy role first so the legacy-addressed assignment keeps the same role and avoids replacement.
 - `terraform state mv` is not required for the default single-role path. It may be required only for consumers who already migrated state to a previous keyed-address-only model.
 
 There are also several other add-ons that can be deployed on the AKS cluster to provide additional functionalities. They are found
@@ -179,9 +180,9 @@ No providers.
 | <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 2.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.0 |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | terraform.registry.launch.nttdata.com/module_primitive/key_vault/azurerm | ~> 1.0 |
-| <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
-| <a name="module_key_vault_additional_role_assignments"></a> [key\_vault\_additional\_role\_assignments](#module\_key\_vault\_additional\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
-| <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
+| <a name="module_key_vault_role_assignment"></a> [key\_vault\_role\_assignment](#module\_key\_vault\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.3 |
+| <a name="module_key_vault_additional_role_assignments"></a> [key\_vault\_additional\_role\_assignments](#module\_key\_vault\_additional\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.3 |
+| <a name="module_additional_key_vaults_role_assignment"></a> [additional\_key\_vaults\_role\_assignment](#module\_additional\_key\_vaults\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.3 |
 | <a name="module_cluster_identity"></a> [cluster\_identity](#module\_cluster\_identity) | terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm | ~> 1.0 |
 | <a name="module_workload_user_assigned_identities"></a> [workload\_user\_assigned\_identities](#module\_workload\_user\_assigned\_identities) | terraform.registry.launch.nttdata.com/module_primitive/user_managed_identity/azurerm | ~> 1.0 |
 | <a name="module_workload_federated_identity_credentials"></a> [workload\_federated\_identity\_credentials](#module\_workload\_federated\_identity\_credentials) | terraform.registry.launch.nttdata.com/module_primitive/federated_identity_credential/azurerm | ~> 1.0 |
