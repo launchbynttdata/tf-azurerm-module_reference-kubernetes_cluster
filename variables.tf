@@ -1044,12 +1044,29 @@ variable "key_vault_role_definition" {
   description = "Permission assigned to the key vault MSI on the key vault. Default is `Key Vault Administrator`"
   type        = string
   default     = "Key Vault Administrator"
+
+  validation {
+    condition     = trimspace(var.key_vault_role_definition) != ""
+    error_message = "key_vault_role_definition must not be empty."
+  }
+}
+
+variable "key_vault_role_definitions" {
+  description = "Optional list of roles to assign to the key vault MSI on the key vault(s). If empty, the single role in `key_vault_role_definition` is used for backward compatibility."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for role in var.key_vault_role_definitions : trimspace(role) != ""])
+    error_message = "key_vault_role_definitions must not contain empty role names."
+  }
 }
 
 variable "additional_key_vault_ids" {
   description = <<EOT
     IDs of the additional key vaults to be associated with the AKS cluster. The key vault MSI will be assigned
-    the role defined in `key_vault_role_definition` on these key vaults.
+    the role(s) defined in `key_vault_role_definitions` (or `key_vault_role_definition` when the list is empty)
+    on these key vaults.
   EOT
   type        = list(string)
   default     = []
@@ -1184,6 +1201,12 @@ variable "public_dns_zone_name" {
   description = "Name of a public DNS zone to create with the kubernetes cluster"
   type        = string
   default     = null
+}
+
+variable "kubelet_dns_zone_contributor_role_name" {
+  description = "Role assigned to kubelet identity for public DNS zone management. Set empty string to disable this assignment."
+  type        = string
+  default     = "DNS Zone Contributor"
 }
 
 ## Key Vault related variables

@@ -67,12 +67,26 @@ module "key_vault" {
 # Assigns the Key Vault MSI Admin role on the Key Vault created above. This is required for the AKS nodes to access the Key Vault.
 module "key_vault_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
   count = var.create_key_vault ? 1 : 0
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
-  role_definition_name = var.key_vault_role_definition
+  role_definition_name = local.key_vault_primary_role_definition
+  scope                = module.key_vault[0].key_vault_id
+
+  depends_on = [module.aks, module.key_vault]
+}
+
+# Assign extra role definitions on the created key vault using keyed addresses.
+module "key_vault_additional_role_assignments" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.3"
+
+  for_each = var.create_key_vault ? toset(local.key_vault_additional_role_definitions) : toset([])
+
+  principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
+  role_definition_name = each.value
   scope                = module.key_vault[0].key_vault_id
 
   depends_on = [module.aks, module.key_vault]
@@ -81,13 +95,13 @@ module "key_vault_role_assignment" {
 # The Key Vault MSI must be assigned Role to access the Key Vault from which AKS will retrieve the secrets.
 module "additional_key_vaults_role_assignment" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3"
 
-  for_each = toset(var.additional_key_vault_ids)
+  for_each = local.additional_key_vault_role_assignments_effective
 
   principal_id         = module.aks.key_vault_secrets_provider.secret_identity[0].object_id
-  role_definition_name = var.key_vault_role_definition
-  scope                = each.key
+  role_definition_name = each.value.role_definition_name
+  scope                = each.value.scope
 
   depends_on = [module.aks, module.key_vault]
 }
@@ -460,10 +474,10 @@ module "kubelet_public_dns_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.0"
 
-  count = var.public_dns_zone_name != null ? 1 : 0
+  count = var.public_dns_zone_name != null && length(var.kubelet_dns_zone_contributor_role_name) > 0 ? 1 : 0
 
   principal_id         = module.aks.kubelet_identity[0].object_id
-  role_definition_name = "DNS Zone Contributor"
+  role_definition_name = var.kubelet_dns_zone_contributor_role_name
   scope                = module.public_dns_zone[0].ids[0]
 
   depends_on = [module.aks, module.public_dns_zone]
