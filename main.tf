@@ -295,7 +295,7 @@ module "subnet_route_table_assoc" {
 
 module "aks" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   resource_group_name             = var.resource_group_name != null ? var.resource_group_name : module.resource_group[0].name
   location                        = var.region
