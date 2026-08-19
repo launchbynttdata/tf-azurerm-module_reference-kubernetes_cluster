@@ -165,7 +165,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.117 |
 
@@ -195,7 +195,7 @@ No providers.
 | <a name="module_udr_route_table_role_assignment"></a> [udr\_route\_table\_role\_assignment](#module\_udr\_route\_table\_role\_assignment) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_routes"></a> [routes](#module\_routes) | terraform.registry.launch.nttdata.com/module_primitive/route/azurerm | ~> 1.0 |
 | <a name="module_subnet_route_table_assoc"></a> [subnet\_route\_table\_assoc](#module\_subnet\_route\_table\_assoc) | terraform.registry.launch.nttdata.com/module_primitive/routetable_subnet_association/azurerm | ~> 1.0 |
-| <a name="module_aks"></a> [aks](#module\_aks) | terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm | ~> 3.0 |
+| <a name="module_aks"></a> [aks](#module\_aks) | terraform.registry.launch.nttdata.com/module_primitive/kubernetes_cluster/azurerm | ~> 2.0 |
 | <a name="module_node_pool_identity_roles"></a> [node\_pool\_identity\_roles](#module\_node\_pool\_identity\_roles) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_additional_acr_role_assignments"></a> [additional\_acr\_role\_assignments](#module\_additional\_acr\_role\_assignments) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.0 |
 | <a name="module_public_dns_zone"></a> [public\_dns\_zone](#module\_public\_dns\_zone) | terraform.registry.launch.nttdata.com/module_primitive/dns_zone/azurerm | ~> 1.0 |
