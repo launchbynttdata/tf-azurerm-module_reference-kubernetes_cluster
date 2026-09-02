@@ -123,9 +123,9 @@ variable "node_pools" {
     snapshot_id                   = optional(string)
     vnet_subnet_id                = optional(string)
     upgrade_settings = optional(object({
-      drain_timeout_in_minutes      = number
-      node_soak_duration_in_minutes = number
-      max_surge                     = string
+      drain_timeout_in_minutes      = optional(number)
+      node_soak_duration_in_minutes = optional(number)
+      max_surge                     = optional(string)
     }))
     windows_profile = optional(object({
       outbound_nat_enabled = optional(bool, true)
