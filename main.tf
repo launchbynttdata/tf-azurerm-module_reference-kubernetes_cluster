@@ -695,6 +695,18 @@ module "monitor_private_link_scoped_service" {
   resource_id = each.value.id
 }
 
+module "diagnostic_setting" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm"
+  version = "~> 3.0"
+
+  for_each                   = var.diagnostic_settings
+  name                       = each.key
+  target_resource_id         = module.aks.aks_id
+  log_analytics_workspace_id = var.log_analytics_workspace != null ? var.log_analytics_workspace.id : module.aks.azurerm_log_analytics_workspace_id
+  enabled_log                = each.value.enabled_log
+  metrics                    = each.value.metrics
+}
+
 # metric alerts
 module "monitor_action_group" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm"

@@ -680,6 +680,21 @@ variable "workload_identity_enabled" {
 }
 
 # Options for log analytics
+variable "diagnostic_settings" {
+  description = "Diagnostic settings for the AKS cluster, sent to its Log Analytics workspace."
+  type = map(object({
+    enabled_log = optional(list(object({
+      category_group = optional(string)
+      category       = optional(string)
+    })), [])
+    metrics = optional(list(object({
+      category = string
+      enabled  = optional(bool)
+    })), [])
+  }))
+  default = {}
+}
+
 variable "cluster_log_analytics_workspace_name" {
   type        = string
   default     = null
