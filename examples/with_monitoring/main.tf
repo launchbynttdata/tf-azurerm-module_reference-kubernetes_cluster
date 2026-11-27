@@ -43,6 +43,12 @@ module "aks" {
 
   log_analytics_workspace_daily_quota_gb = var.log_analytics_workspace_daily_quota_gb
 
+  diagnostic_settings = {
+    aks_diagnostics = {
+      enabled_log = [{ category_group = "allLogs" }]
+    }
+  }
+
   secrets = {
     username = "test102"
     password = random_password.password.result

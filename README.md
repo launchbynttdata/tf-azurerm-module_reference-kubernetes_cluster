@@ -11,6 +11,20 @@ Some useful examples can be found in the [examples](./examples) directory that d
 1. [Private Cluster](./examples/private-cluster/README.md)
 2. [Public Cluster](./examples/public-cluster/README.md)
 
+## AKS Diagnostic Settings
+
+AKS control-plane diagnostics are opt-in and separate from Container Insights. Configure `diagnostic_settings` to send logs to the existing workspace supplied through `log_analytics_workspace` or to the module-created workspace. To create a workspace, `log_analytics_workspace_enabled` must be true. For example:
+
+```hcl
+diagnostic_settings = {
+  aks_diagnostics = {
+    enabled_log = [{ category_group = "allLogs" }]
+  }
+}
+```
+
+Each map key is the diagnostic setting name. The `allLogs` category group includes the AKS diagnostic log categories supported by Azure and can increase Log Analytics ingestion costs; container and application log collection requires separate configuration. See the [monitoring example](./examples/with_monitoring/).
+
 ## Upgrade Notes
 
 - The default Key Vault role-assignment path remains legacy-address compatible to avoid destroy/recreate during upgrade:
@@ -165,7 +179,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, <= 1.5.5 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.4.0, < 2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.117 |
 
@@ -212,6 +226,7 @@ No providers.
 | <a name="module_monitor_private_link_scope_vnet_link"></a> [monitor\_private\_link\_scope\_vnet\_link](#module\_monitor\_private\_link\_scope\_vnet\_link) | terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm | ~> 1.0 |
 | <a name="module_monitor_private_link_scope_private_endpoint"></a> [monitor\_private\_link\_scope\_private\_endpoint](#module\_monitor\_private\_link\_scope\_private\_endpoint) | terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm | ~> 1.0 |
 | <a name="module_monitor_private_link_scoped_service"></a> [monitor\_private\_link\_scoped\_service](#module\_monitor\_private\_link\_scoped\_service) | terraform.registry.launch.nttdata.com/module_primitive/monitor_private_link_scoped_service/azurerm | ~> 1.0 |
+| <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 3.0 |
 | <a name="module_monitor_action_group"></a> [monitor\_action\_group](#module\_monitor\_action\_group) | terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm | ~> 1.0.2 |
 | <a name="module_monitor_metric_alert"></a> [monitor\_metric\_alert](#module\_monitor\_metric\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm | ~> 2.0 |
 | <a name="module_monitor_scheduled_query_alert"></a> [monitor\_scheduled\_query\_alert](#module\_monitor\_scheduled\_query\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_scheduled_query_alert/azurerm | ~> 1.0.2 |
@@ -302,6 +317,7 @@ No resources.
 | <a name="input_local_account_disabled"></a> [local\_account\_disabled](#input\_local\_account\_disabled) | (Optional) - If `true` local accounts will be disabled. Defaults to `false`. See [the documentation](https://docs.microsoft.com/azure/aks/managed-aad#disable-local-accounts) for more information. | `bool` | `null` | no |
 | <a name="input_oidc_issuer_enabled"></a> [oidc\_issuer\_enabled](#input\_oidc\_issuer\_enabled) | Enable or Disable the OIDC issuer URL. Defaults to false. | `bool` | `false` | no |
 | <a name="input_workload_identity_enabled"></a> [workload\_identity\_enabled](#input\_workload\_identity\_enabled) | Enable or Disable Workload Identity. If enabled, oidc\_issuer\_enabled must be true. Defaults to false. | `bool` | `false` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for the AKS cluster, sent to its Log Analytics workspace. | <pre>map(object({<br/>    enabled_log = optional(list(object({<br/>      category_group = optional(string)<br/>      category       = optional(string)<br/>    })), [])<br/>    metrics = optional(list(object({<br/>      category = string<br/>      enabled  = optional(bool)<br/>    })), [])<br/>  }))</pre> | `{}` | no |
 | <a name="input_cluster_log_analytics_workspace_name"></a> [cluster\_log\_analytics\_workspace\_name](#input\_cluster\_log\_analytics\_workspace\_name) | (Optional) The name of the Analytics workspace to create | `string` | `null` | no |
 | <a name="input_log_analytics_workspace"></a> [log\_analytics\_workspace](#input\_log\_analytics\_workspace) | (Optional) Existing azurerm\_log\_analytics\_workspace to attach azurerm\_log\_analytics\_solution. Providing the config disables creation of azurerm\_log\_analytics\_workspace. | <pre>object({<br/>    id                  = string<br/>    name                = string<br/>    location            = optional(string)<br/>    resource_group_name = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_log_analytics_workspace_allow_resource_only_permissions"></a> [log\_analytics\_workspace\_allow\_resource\_only\_permissions](#input\_log\_analytics\_workspace\_allow\_resource\_only\_permissions) | (Optional) Specifies if the log Analytics Workspace allow users accessing to data associated with resources they have permission to view, without permission to workspace. Defaults to `true`. | `bool` | `null` | no |
